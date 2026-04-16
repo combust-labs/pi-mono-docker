@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: Apache-2.0
 # Makefile for building the Docker image
 
 # Extract the PI_MONO_VERSION argument from Containerfile (e.g., v0.67.5)

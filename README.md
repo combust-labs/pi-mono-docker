@@ -1,3 +1,4 @@
+<!-- SPDX-License-Identifier: Apache-2.0 -->
 # pi-mono Docker Build
 
 This repository provides a minimal Docker image that runs the **pi-mono coding‑agent** (`pi‑mono`).
