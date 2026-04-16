@@ -1,6 +1,6 @@
 # pi-mono Docker Build
 
-This repository provides a minimal Docker image that runs the **Radek G coding‑agent** (`pi‑mono`).
+This repository provides a minimal Docker image that runs the **pi-mono coding‑agent** (`pi‑mono`).
 
 ## What it contains
 - **Dockerfile** – builds the image from `node:25‑trixie`, installs required tools, clones the `pi‑mono` source at the pinned version, builds it, and copies the `pi` CLI entry point.
