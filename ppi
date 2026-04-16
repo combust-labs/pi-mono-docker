@@ -1,0 +1,77 @@
+#!/bin/bash
+
+use_port=0
+use_model=${PI_DEFAULT_MODEL:-"gpt-oss-120b-MXFP4-Q8"}
+use_prompt=${PI_DEFAULT_PROMPT:-"Summarize current the project"}
+
+# Function to validate port
+is_port() {
+  local port=$1
+  # Check if the input is a sequence of digits
+  if [[ $port =~ ^[0-9]+$ ]]; then
+      # Check if it falls within the valid range 1-65535
+      if (( port >= 1 && port <= 65535 )); then
+          return 0 # Valid
+      fi
+  fi
+  return 1 # Invalid
+}
+
+if [ ! -d "$(pwd)/.pi/sessions" ]; then
+  mkdir -p "$(pwd)/.pi/sessions"
+  touch "$(pwd)/.pi/sessions/.gitkeep"
+fi
+
+while (( "$#" )); do
+    case "${1}" in
+        --model)
+            use_model="${2}"
+            shift 2
+            ;;
+        --port)
+          maybe_port="${2}"
+          if is_port "${maybe_port}"; then
+            use_port="${2}"
+            shift 2
+          else
+            echo "Error: Invalid port ${maybe_port}"
+            exit 1
+          fi
+          ;;
+        -*)
+            echo "Error: Unsupported flag ${1}" >&2
+            exit 1
+            ;;
+    esac
+done
+
+if (( use_port >= 1  )); then
+
+  docker run --rm -ti \
+    -p 3000:3000 \
+    -v ~/.gitconfig:/root/.gitconfig:ro \
+    -v ~/.gitconfig-github-private.inc:/root/.gitconfig-github-private.inc:ro \
+    -v ~/.pi/agent/models.json:/root/.pi/agent/models.json:ro \
+    -v ~/.pi/agent/agents:/root/.pi/agent/agents:ro \
+    -v ~/.pi/agent/extensions/subagent:/root/.pi/agent/extensions/subagent:ro \
+    -v ~/.pi/agent/prompts:/root/.pi/agent/prompts:ro \
+    -v $(pwd)/.pi/sessions:/root/.pi/agent/sessions \
+    -v $(pwd):/code \
+    -e PORT=${use_port} \
+    --entrypoint /opt/agent/pi-mono/node_modules/pi-rpc-http-server/bin/run.sh \
+    localhost/pi-mono:v0.67.5
+
+else
+
+  docker run --rm -ti \
+    -v ~/.gitconfig:/root/.gitconfig:ro \
+    -v ~/.gitconfig-github-private.inc:/root/.gitconfig-github-private.inc:ro \
+    -v ~/.pi/agent/models.json:/root/.pi/agent/models.json:ro \
+    -v ~/.pi/agent/agents:/root/.pi/agent/agents:ro \
+    -v ~/.pi/agent/extensions/subagent:/root/.pi/agent/extensions/subagent:ro \
+    -v ~/.pi/agent/prompts:/root/.pi/agent/prompts:ro \
+    -v $(pwd)/.pi/sessions:/root/.pi/agent/sessions \
+    -v $(pwd):/code \
+    localhost/pi-mono:v0.67.5 --model "${use_model}" "${use_prompt}"
+    
+fi
