@@ -1,6 +1,11 @@
 # SPDX-License-Identifier: Apache-2.0
 # Makefile for building the Docker image
 
+# Help target
+help:
+	@echo "Available make targets:"
+	@grep -E '^[a-zA-Z0-9_-]+:' $(MAKEFILE_LIST) | grep -v '^\.PHONY' | cut -d: -f1 | sort
+
 # Extract the PI_MONO_VERSION argument from Containerfile (e.g., v0.67.5)
 VERSION := $(shell grep -E '^ARG PI_MONO_VERSION=' container/Containerfile | cut -d'=' -f2)
 
