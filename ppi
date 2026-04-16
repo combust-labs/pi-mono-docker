@@ -1,8 +1,17 @@
 #!/bin/bash
 
+# Base directory of this script (absolute path)
+base=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+
 use_port=0
 use_model=${PI_DEFAULT_MODEL:-"gpt-oss-120b-MXFP4-Q8"}
 use_prompt=${PI_DEFAULT_PROMPT:-"Summarize current the project"}
+# Default version
+use_version=v0.67.6
+# Override if Containerfile exists
+if [ -f "${base}/container/Containerfile" ]; then
+  use_version=$(grep -E '^ARG PI_MONO_VERSION=' "${base}/container/Containerfile" | cut -d'=' -f2)
+fi
 
 # Function to validate port
 is_port() {
@@ -38,6 +47,10 @@ while (( "$#" )); do
             exit 1
           fi
           ;;
+        --version)
+            use_version="${2}"
+            shift 2
+            ;;
         -*)
             echo "Error: Unsupported flag ${1}" >&2
             exit 1
@@ -59,7 +72,7 @@ if (( use_port >= 1  )); then
     -v $(pwd):/code \
     -e PORT=${use_port} \
     --entrypoint /opt/agent/pi-mono/node_modules/pi-rpc-http-server/bin/run.sh \
-    localhost/pi-mono:v0.67.5
+    "localhost/pi-mono:${use_version}"
 
 else
 
@@ -72,6 +85,6 @@ else
     -v ~/.pi/agent/prompts:/root/.pi/agent/prompts:ro \
     -v $(pwd)/.pi/sessions:/root/.pi/agent/sessions \
     -v $(pwd):/code \
-    localhost/pi-mono:v0.67.5 --model "${use_model}" "${use_prompt}"
+    "localhost/pi-mono:${use_version}" --model "${use_model}" "${use_prompt}"
     
 fi
