@@ -1,7 +1,7 @@
-ARG PI_MONO_VERSION=v0.67.5
-ARG GIT_REPO=https://github.com/badlogic/pi-mono.git
-
 FROM node:25-trixie
+
+ARG PI_MONO_VERSION=v0.67.6
+ARG PI_MONO_GIT_REPO=https://github.com/badlogic/pi-mono.git
 
 ENV PATH="$PATH:/root/.local/bin:/opt/agent/pi-mono/packages/coding-agent/dist"
 
@@ -11,7 +11,7 @@ RUN mkdir -p /root/.local/bin \
   && ln -s $(which fdfind) /root/.local/bin/fd \
   && mkdir -p /opt/agent/pi-mono \
   && cd /opt/agent/pi-mono \
-  && git clone ${GIT_REPO} . \
+  && git clone ${PI_MONO_GIT_REPO} . \
   && git checkout ${PI_MONO_VERSION} \
   && npm install \
   && npm run build \
