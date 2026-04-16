@@ -13,5 +13,8 @@ install-ppi:
 	@cp ppi "$$HOME/.local/bin/ppi"
 	@chmod +x "$$HOME/.local/bin/ppi"
 	@echo "Installed ppi to $$HOME/.local/bin/ppi"
-	@echo "Add $$HOME/.local/bin to your PATH, e.g., export PATH=\"$$HOME/.local/bin:\$PATH\""
+	@echo "Add $$HOME/.local/bin to your PATH, e.g., export PATH=\"$$HOME/.local/bin:$$PATH\""
+
+hf-push-sessions:
+	@[ -d ./.pi/sessions/--code--/ ] && hf upload rgruchalski/combust-labs_pi-mono-docker ./.pi/sessions/--code--/ --repo-type=dataset
 
