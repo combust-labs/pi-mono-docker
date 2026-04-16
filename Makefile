@@ -1,12 +1,12 @@
 # Makefile for building the Docker image
 
-# Extract the PI_MONO_VERSION argument from Dockerfile (e.g., v0.67.5)
-VERSION := $(shell grep -E '^ARG PI_MONO_VERSION=' Dockerfile | cut -d'=' -f2)
+# Extract the PI_MONO_VERSION argument from Containerfile (e.g., v0.67.5)
+VERSION := $(shell grep -E '^ARG PI_MONO_VERSION=' container/Containerfile | cut -d'=' -f2)
 
 .PHONY: build-docker install-ppi
 build-docker:
 	@echo "Building Docker image with tag localhost/pi-mono:$(VERSION)"
-	docker build --no-cache -t localhost/pi-mono:$(VERSION) .
+	@cd container && docker build --no-cache -f Containerfile -t localhost/pi-mono:$(VERSION) .
 
 install-ppi:
 	@mkdir -p "$$HOME/.local/bin"
