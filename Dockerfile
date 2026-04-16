@@ -1,0 +1,35 @@
+ARG PI_MONO_VERSION=v0.67.5
+
+FROM node:25-trixie
+
+ENV PATH="$PATH:/root/.local/bin:/opt/agent/pi-mono/packages/coding-agent/dist"
+
+RUN mkdir -p /root/.local/bin \
+  && apt update \
+  && apt install -y fd-find ripgrep unzip zip \
+  && ln -s $(which fdfind) /root/.local/bin/fd \
+  && mkdir -p /opt/agent/pi-mono \
+  && cd /opt/agent/pi-mono \
+  && git clone https://github.com/radekg/pi-mono.git . \
+  && git checkout ${PI_MONO_VERSION} \
+  && npm install \
+  && npm run build \
+  && npm run check \
+  && npm install --save "git://github.com/combust-labs/pi-mono-http-proxy.git#3ec12f7e68f0578369935810b669d08638e9d371" \
+  && chmod 0755 /opt/agent/pi-mono/node_modules/pi-rpc-http-server/bin/run.sh \
+  && curl -fsSL https://get.pnpm.io/install.sh | bash -
+RUN if [ "$(uname -m)" = "aarch64" ] ; then \
+  apt-get install -y chromium ; \
+  export PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true ; \
+  export PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser ; \
+  fi
+
+COPY pi /opt/agent/pi-mono/packages/coding-agent/dist/pi
+
+RUN chmod 0755 /opt/agent/pi-mono/packages/coding-agent/dist/pi
+
+VOLUME ["/code"]
+
+WORKDIR /code
+
+ENTRYPOINT ["pi"]
