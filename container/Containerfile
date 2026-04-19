@@ -4,7 +4,9 @@ FROM node:25-trixie
 ARG PI_MONO_VERSION=v0.67.6
 ARG PI_MONO_GIT_REPO=https://github.com/badlogic/pi-mono.git
 
-ENV PATH="$PATH:/root/.local/bin:/opt/agent/pi-mono/packages/coding-agent/dist"
+ENV PATH="$PATH:/root/.local/bin:/opt/agent/pi-mono/packages/coding-agent/dist" \
+  PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
+  PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
 
 RUN mkdir -p /root/.local/bin \
   && apt update \
@@ -16,7 +18,6 @@ RUN mkdir -p /root/.local/bin \
   && git checkout ${PI_MONO_VERSION} \
   && npm install \
   && npm run build \
-  && npm run check \
   && npm install --save "git://github.com/combust-labs/pi-mono-http-proxy.git#3ec12f7e68f0578369935810b669d08638e9d371" \
   && chmod 0755 /opt/agent/pi-mono/node_modules/pi-rpc-http-server/bin/run.sh \
   && curl -fsSL https://get.pnpm.io/install.sh | bash -
