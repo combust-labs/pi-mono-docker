@@ -53,16 +53,16 @@ The `ppi` script supports the following flags:
 | `--model <pattern>` | `gpt-oss-120b-MXFP4-Q8` | Model pattern or ID (supports `provider/id` and optional `:thinking`) |
 | `--provider <name>` | (empty) | Provider name |
 | `--system-prompt <text>` | (empty) | System prompt (default: coding assistant prompt) |
-| `--append-system-prompt <text>` | (empty) | Append text or file contents to system prompt |
+| `--append-system-prompt <text>` | (empty) | Append text to system prompt (allows multiple) |
 | `--prompt <text>` | `Summarize current the project` | Initial prompt to send to the agent |
 | `--thinking <level>` | (empty) | Thinking level: `off`, `minimal`, `low`, `medium`, `high`, `xhigh` |
 | `--port <n>` | (CLI mode) | Start HTTP‑RPC server on port `n` |
 | `--version <v>` | from Containerfile | Override pi‑mono container version |
 | `--mode <text|json>` | `text` | Output mode (rpc value is disallowed) |
 | `--session-dir <dir>` | (empty) | Session storage directory |
-| `--tools <tools>` | (empty) | Tool allowlist |
-| `--theme <path>` | (empty) | Load theme file/directory |
-| `--models <patterns>` | (empty) | Model cycling patterns |
+| `--tools <tools>` | (empty) | Tool allowlist (allows multiple) |
+| `--theme <path>` | (empty) | Load theme file/directory (allows multiple) |
+| `--models <patterns>` | (empty) | Model cycling patterns (allows multiple) |
 | `--list-models [search]` | (empty) | List available models (optional search term) |
 | `--export <file>` | (empty) | Export session to HTML |
 | `--extension <path>`, `-e` | (empty) | Load extension file (allows multiple) |

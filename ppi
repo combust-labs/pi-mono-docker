@@ -9,7 +9,7 @@ use_model=${PI_DEFAULT_MODEL:-"gpt-oss-120b-MXFP4-Q8"}
 use_prompt=${PI_DEFAULT_PROMPT:-"Summarize current the project"}
 use_provider=""
 use_system_prompt=""
-use_append_system_prompt=""
+use_append_system_prompt=()
 use_continue=0
 use_resume=0
 use_no_session=0
@@ -24,9 +24,9 @@ use_no_themes=0
 use_no_context_files=0
 use_mode=""
 use_session_dir=""
-use_tools=""
-use_theme=""
-use_models=""
+use_tools=()
+use_theme=()
+use_models=()
 use_list_models=""
 use_export=""
 use_extension=()
@@ -105,7 +105,7 @@ while (( "$#" )); do
             shift 2
             ;;
         --append-system-prompt)
-            use_append_system_prompt="${2}"
+            use_append_system_prompt+=("${2}")
             shift 2
             ;;
         --continue)
@@ -165,15 +165,15 @@ while (( "$#" )); do
             shift 2
             ;;
         --tools)
-            use_tools="${2}"
+            use_tools+=("${2}")
             shift 2
             ;;
         --theme)
-            use_theme="${2}"
+            use_theme+=("${2}")
             shift 2
             ;;
         --models)
-            use_models="${2}"
+            use_models+=("${2}")
             shift 2
             ;;
         --list-models)
@@ -259,6 +259,26 @@ for pt in "${use_prompt_template[@]}"; do
   _prompt_template_flags="${_prompt_template_flags}--prompt-template \"${pt}\" "
 done
 
+_append_system_prompt_flags=""
+for asp in "${use_append_system_prompt[@]}"; do
+  _append_system_prompt_flags="${_append_system_prompt_flags}--append-system-prompt \"${asp}\" "
+done
+
+_tools_flags=""
+for tl in "${use_tools[@]}"; do
+  _tools_flags="${_tools_flags}--tools \"${tl}\" "
+done
+
+_theme_flags=""
+for th in "${use_theme[@]}"; do
+  _theme_flags="${_theme_flags}--theme \"${th}\" "
+done
+
+_models_flags=""
+for md in "${use_models[@]}"; do
+  _models_flags="${_models_flags}--models \"${md}\" "
+done
+
 if (( use_port >= 1  )); then
 
   docker run --rm -ti \
@@ -292,7 +312,7 @@ else
         --model "${use_model}" \
         ${use_provider:+--provider "${use_provider}"} \
         ${use_system_prompt:+--system-prompt "${use_system_prompt}"} \
-        ${use_append_system_prompt:+--append-system-prompt "${use_append_system_prompt}"} \
+        ${_append_system_prompt_flags} \
         ${use_continue:+--continue} \
         ${use_resume:+--resume} \
         ${use_no_session:+--no-session} \
@@ -308,9 +328,9 @@ else
         ${use_thinking:+--thinking "${use_thinking}"} \
         ${use_mode:+--mode "${use_mode}"} \
         ${use_session_dir:+--session-dir "${use_session_dir}"} \
-        ${use_tools:+--tools "${use_tools}"} \
-        ${use_theme:+--theme "${use_theme}"} \
-        ${use_models:+--models "${use_models}"} \
+        ${_tools_flags} \
+        ${_theme_flags} \
+        ${_models_flags} \
         ${use_list_models:+--list-models${use_list_models:+" ${use_list_models}"}} \
         ${use_export:+--export "${use_export}"} \
         ${_extension_flags} \
