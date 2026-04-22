@@ -32,6 +32,7 @@ use_export=""
 use_extension=()
 use_skill=()
 use_prompt_template=()
+use_print=0
 # Default version
 use_version=v0.67.6
 # Override if Containerfile exists
@@ -149,6 +150,10 @@ while (( "$#" )); do
             ;;
         --no-context-files)
             use_no_context_files=1
+            shift
+            ;;
+        --print|-p)
+            use_print=1
             shift
             ;;
         --mode)
@@ -293,6 +298,7 @@ else
         ${use_no_session:+--no-session} \
         ${use_verbose:+--verbose} \
         ${use_offline:+--offline} \
+        ${use_print:+--print} \
         ${use_no_tools:+--no-tools} \
         ${use_no_extensions:+--no-extensions} \
         ${use_no_skills:+--no-skills} \

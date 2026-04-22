@@ -77,6 +77,7 @@ The `ppi` script supports the following flags:
 | `--no-session` | Don't save session (ephemeral mode) |
 | `--verbose` | Force verbose startup |
 | `--offline` | Disable startup network operations |
+| `--print`, `-p` | Non‑interactive mode (process prompt and exit) |
 | `--no-tools` | Disable all tools |
 | `--no-extensions` | Disable extension discovery |
 | `--no-skills` | Disable skills |
@@ -112,7 +113,6 @@ ppi --port 3000 --model gpt-4o
 The following `pi` flags are not yet exposed through `ppi`:
 
 - `--api-key` – API key (use environment variables instead)
-- `--print`, `-p` – Non‑interactive mode
 - `--session <path|id>` – Use specific session
 - `--fork <path|id>` – Fork a session
 - `--help`, `-h` – Show help
