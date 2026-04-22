@@ -51,7 +51,7 @@ use_resume=0
 # Use specific session
 use_session=""
 # Session storage directory
-use_session_dir=""
+use_session_dir="$(pwd)/.pi/sessions"
 # Load skill file/directory (allows multiple)
 use_skill=()
 # System prompt (default: coding assistant prompt)
@@ -116,9 +116,9 @@ is_flag() {
   [[ "${arg}" == --* ]] || [[ "${arg}" == -* ]]
 }
 
-if [ ! -d "$(pwd)/.pi/sessions" ]; then
-  mkdir -p "$(pwd)/.pi/sessions"
-  touch "$(pwd)/.pi/sessions/.gitkeep"
+if [ ! -d "${use_session_dir}" ]; then
+  mkdir -p "${use_session_dir}"
+  touch "${use_session_dir}/.gitkeep"
 fi
 
 while (( "$#" )); do
