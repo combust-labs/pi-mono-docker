@@ -7,6 +7,15 @@ base=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 use_port=0
 use_model=${PI_DEFAULT_MODEL:-"gpt-oss-120b-MXFP4-Q8"}
 use_prompt=${PI_DEFAULT_PROMPT:-"Summarize current the project"}
+use_provider=""
+use_system_prompt=""
+use_append_system_prompt=""
+use_continue=0
+use_resume=0
+use_no_session=0
+use_verbose=0
+use_offline=0
+use_thinking=""
 # Default version
 use_version=v0.67.6
 # Override if Containerfile exists
@@ -27,6 +36,19 @@ is_port() {
   return 1 # Invalid
 }
 
+# Function to validate thinking level
+is_valid_thinking() {
+  local level=$1
+  case "$level" in
+    off|minimal|low|medium|high|xhigh)
+      return 0 # Valid
+      ;;
+    *)
+      return 1 # Invalid
+      ;;
+  esac
+}
+
 if [ ! -d "$(pwd)/.pi/sessions" ]; then
   mkdir -p "$(pwd)/.pi/sessions"
   touch "$(pwd)/.pi/sessions/.gitkeep"
@@ -36,6 +58,42 @@ while (( "$#" )); do
     case "${1}" in
         --model)
             use_model="${2}"
+            shift 2
+            ;;
+        --provider)
+            use_provider="${2}"
+            shift 2
+            ;;
+        --system-prompt)
+            use_system_prompt="${2}"
+            shift 2
+            ;;
+        --append-system-prompt)
+            use_append_system_prompt="${2}"
+            shift 2
+            ;;
+        --continue)
+            use_continue=1
+            shift
+            ;;
+        --resume)
+            use_resume=1
+            shift
+            ;;
+        --no-session)
+            use_no_session=1
+            shift
+            ;;
+        --verbose)
+            use_verbose=1
+            shift
+            ;;
+        --offline)
+            use_offline=1
+            shift
+            ;;
+        --thinking)
+            use_thinking="${2}"
             shift 2
             ;;
         --prompt)
@@ -62,6 +120,12 @@ while (( "$#" )); do
             ;;
     esac
 done
+
+# Validate thinking level if provided
+if [[ -n "${use_thinking}" ]] && ! is_valid_thinking "${use_thinking}"; then
+  echo "Warning: Invalid thinking level \"${use_thinking}\". Valid values: off, minimal, low, medium, high, xhigh" >&2
+  use_thinking=""
+fi
 
 if (( use_port >= 1  )); then
 
@@ -92,6 +156,17 @@ else
     -v ~/.pi/agent/prompts:/root/.pi/agent/prompts:ro \
     -v $(pwd)/.pi/sessions:/root/.pi/agent/sessions \
     -v $(pwd):/code \
-    "localhost/pi-mono:${use_version}" --model "${use_model}" "${use_prompt}"
+    "localhost/pi-mono:${use_version}" \
+        --model "${use_model}" \
+        ${use_provider:+--provider "${use_provider}"} \
+        ${use_system_prompt:+--system-prompt "${use_system_prompt}"} \
+        ${use_append_system_prompt:+--append-system-prompt "${use_append_system_prompt}"} \
+        ${use_continue:+--continue} \
+        ${use_resume:+--resume} \
+        ${use_no_session:+--no-session} \
+        ${use_verbose:+--verbose} \
+        ${use_offline:+--offline} \
+        ${use_thinking:+--thinking "${use_thinking}"} \
+        "${use_prompt}"
     
 fi
