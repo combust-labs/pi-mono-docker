@@ -43,6 +43,83 @@ Both modes mount the current project directory at `/code` and bind‑mount user 
 
 ---
 
+## Supported `ppi` Flags
+
+The `ppi` script supports the following flags:
+
+### String Flags
+| Flag | Default | Description |
+|------|---------|-------------|
+| `--model <pattern>` | `gpt-oss-120b-MXFP4-Q8` | Model pattern or ID (supports `provider/id` and optional `:thinking`) |
+| `--provider <name>` | (empty) | Provider name |
+| `--system-prompt <text>` | (empty) | System prompt (default: coding assistant prompt) |
+| `--append-system-prompt <text>` | (empty) | Append text or file contents to system prompt |
+| `--prompt <text>` | `Summarize current the project` | Initial prompt to send to the agent |
+| `--thinking <level>` | (empty) | Thinking level: `off`, `minimal`, `low`, `medium`, `high`, `xhigh` |
+| `--port <n>` | (CLI mode) | Start HTTP‑RPC server on port `n` |
+| `--version <v>` | from Containerfile | Override pi‑mono container version |
+
+### Boolean Flags
+| Flag | Description |
+|------|-------------|
+| `--continue` | Continue previous session |
+| `--resume` | Select and resume a session |
+| `--no-session` | Don't save session (ephemeral mode) |
+| `--verbose` | Force verbose startup |
+| `--offline` | Disable startup network operations |
+
+### Examples
+```bash
+# Basic usage with default prompt
+ppi
+
+# Custom prompt
+ppi --prompt "List all TypeScript files in src/"
+
+# Different model with thinking level
+ppi --model gpt-4o --thinking high "Analyze this code"
+
+# Continue previous session
+ppi --continue "What did we discuss last time?"
+
+# With custom system prompt
+ppi --system-prompt "You are a code reviewer" --prompt "Review PR #123"
+
+# Start RPC server on port 3000
+ppi --port 3000 --model gpt-4o
+```
+
+---
+
+## Unsupported `pi` Flags
+
+The following `pi` flags are not yet exposed through `ppi`:
+
+- `--api-key` – API key (use environment variables instead)
+- `--mode <text|json|rpc>` – Output mode (default: text)
+- `--print`, `-p` – Non‑interactive mode
+- `--session <path|id>` – Use specific session
+- `--fork <path|id>` – Fork a session
+- `--session-dir <dir>` – Session storage directory
+- `--no-tools` – Disable all tools
+- `--tools <tools>` – Tool allowlist
+- `--extension`, `-e` – Load extension file
+- `--no-extensions`, `-ne` – Disable extension discovery
+- `--skill <path>` – Load skill file/directory
+- `--no-skills`, `-ns` – Disable skills
+- `--prompt-template <path>` – Load prompt template
+- `--no-prompt-templates`, `-np` – Disable prompt templates
+- `--theme <path>` – Load theme file/directory
+- `--no-themes` – Disable themes
+- `--no-context-files`, `-nc` – Disable AGENTS.md/CLAUDE.md
+- `--models <patterns>` – Model cycling patterns
+- `--list-models [search]` – List available models
+- `--export <file>` – Export session to HTML
+- `--help`, `-h` – Show help
+- `--version`, `-v` – Show version
+
+---
+
 ### Hugging Face dataset
 
 Session data is uploaded to the Hugging Face dataset `rgruchalski/combust-labs_pi-mono-docker`. You can view the datasets at https://huggingface.co/datasets/rgruchalski/combust-labs_pi-mono-docker
