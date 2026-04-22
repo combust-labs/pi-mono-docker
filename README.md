@@ -73,18 +73,18 @@ The `ppi` script supports the following flags:
 ### Boolean Flags
 | Flag | Description |
 |------|-------------|
-| `--continue` | Continue previous session |
-| `--resume` | Select and resume a session |
+| `--continue`, `-c` | Continue previous session |
+| `--resume`, `-r` | Select and resume a session |
 | `--no-session` | Don't save session (ephemeral mode) |
 | `--verbose` | Force verbose startup |
 | `--offline` | Disable startup network operations |
 | `--print`, `-p` | Non‑interactive mode (process prompt and exit) |
 | `--no-tools` | Disable all tools |
-| `--no-extensions` | Disable extension discovery |
-| `--no-skills` | Disable skills |
-| `--no-prompt-templates` | Disable prompt templates |
+| `--no-extensions`, `-ne` | Disable extension discovery |
+| `--no-skills`, `-ns` | Disable skills |
+| `--no-prompt-templates`, `-np` | Disable prompt templates |
 | `--no-themes` | Disable themes |
-| `--no-context-files` | Disable AGENTS.md/CLAUDE.md context files |
+| `--no-context-files`, `-nc` | Disable AGENTS.md/CLAUDE.md context files |
 
 ### Examples
 ```bash

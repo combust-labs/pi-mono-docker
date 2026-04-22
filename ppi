@@ -109,11 +109,11 @@ while (( "$#" )); do
             use_append_system_prompt+=("${2}")
             shift 2
             ;;
-        --continue)
+        --continue|-c)
             use_continue=1
             shift
             ;;
-        --resume)
+        --resume|-r)
             use_resume=1
             shift
             ;;
@@ -133,15 +133,15 @@ while (( "$#" )); do
             use_no_tools=1
             shift
             ;;
-        --no-extensions)
+        --no-extensions|-ne)
             use_no_extensions=1
             shift
             ;;
-        --no-skills)
+        --no-skills|-ns)
             use_no_skills=1
             shift
             ;;
-        --no-prompt-templates)
+        --no-prompt-templates|-np)
             use_no_prompt_templates=1
             shift
             ;;
@@ -149,7 +149,7 @@ while (( "$#" )); do
             use_no_themes=1
             shift
             ;;
-        --no-context-files)
+        --no-context-files|-nc)
             use_no_context_files=1
             shift
             ;;
