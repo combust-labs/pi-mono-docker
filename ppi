@@ -4,37 +4,67 @@
 # Base directory of this script (absolute path)
 base=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 
-use_port=0
-use_model=${PI_DEFAULT_MODEL:-"gpt-oss-120b-MXFP4-Q8"}
-use_prompt=${PI_DEFAULT_PROMPT:-"Summarize current the project"}
-use_provider=""
-use_system_prompt=""
+# Append text to system prompt (allows multiple)
 use_append_system_prompt=()
+# Continue previous session
 use_continue=0
-use_resume=0
-use_no_session=0
-use_verbose=0
-use_offline=0
-use_thinking=""
-use_no_tools=0
-use_no_extensions=0
-use_no_skills=0
-use_no_prompt_templates=0
-use_no_themes=0
-use_no_context_files=0
-use_mode=""
-use_session=""
-use_session_dir=""
-use_tools=()
-use_theme=()
-use_models=()
-use_list_models=""
+# Export session to HTML
 use_export=""
+# Load extension file (allows multiple)
 use_extension=()
-use_skill=()
-use_prompt_template=()
+# List available models (optional search term)
+use_list_models=""
+# Output mode (text|json, rpc is disallowed)
+use_mode=""
+# Model pattern or ID
+use_model=${PI_DEFAULT_MODEL:-"gpt-oss-120b-MXFP4-Q8"}
+# Model cycling patterns (allows multiple)
+use_models=()
+# Disable AGENTS.md/CLAUDE.md context files
+use_no_context_files=0
+# Disable extension discovery
+use_no_extensions=0
+# Disable prompt templates
+use_no_prompt_templates=0
+# Don't save session (ephemeral mode)
+use_no_session=0
+# Disable skills
+use_no_skills=0
+# Disable themes
+use_no_themes=0
+# Disable all tools
+use_no_tools=0
+# Disable startup network operations
+use_offline=0
+# Start HTTP-RPC server on port n (CLI mode when 0)
+use_port=0
+# Non-interactive mode (process prompt and exit)
 use_print=0
-# Default version
+# Initial prompt to send to the agent
+use_prompt=${PI_DEFAULT_PROMPT:-"Summarize current the project"}
+# Load prompt template (allows multiple)
+use_prompt_template=()
+# Provider name
+use_provider=""
+# Select and resume a session
+use_resume=0
+# Use specific session
+use_session=""
+# Session storage directory
+use_session_dir=""
+# Load skill file/directory (allows multiple)
+use_skill=()
+# System prompt (default: coding assistant prompt)
+use_system_prompt=""
+# Load theme file/directory (allows multiple)
+use_theme=()
+# Thinking level: off, minimal, low, medium, high, xhigh
+use_thinking=""
+# Tool allowlist (allows multiple)
+use_tools=()
+# Force verbose startup
+use_verbose=0
+# pi-mono container version
 use_version=v0.67.6
 # Override if Containerfile exists
 if [ -f "${base}/container/Containerfile" ]; then
