@@ -12,6 +12,7 @@ use_system_prompt=""
 use_append_system_prompt=""
 use_continue=0
 use_resume=0
+use_no_session=0
 # Default version
 use_version=v0.67.6
 # Override if Containerfile exists
@@ -61,6 +62,10 @@ while (( "$#" )); do
             ;;
         --resume)
             use_resume=1
+            shift
+            ;;
+        --no-session)
+            use_no_session=1
             shift
             ;;
         --prompt)
@@ -124,6 +129,7 @@ else
         ${use_append_system_prompt:+--append-system-prompt "${use_append_system_prompt}"} \
         ${use_continue:+--continue} \
         ${use_resume:+--resume} \
+        ${use_no_session:+--no-session} \
         "${use_prompt}"
     
 fi
