@@ -67,6 +67,7 @@ if (( use_port >= 1  )); then
     -v ~/.gitconfig-github-private.inc:/root/.gitconfig-github-private.inc:ro \
     -v ~/.pi/agent/models.json:/root/.pi/agent/models.json:ro \
     -v ~/.pi/agent/agents:/root/.pi/agent/agents:ro \
+    -v ~/.pi/agent/extensions/read-website:/root/.pi/agent/extensions/read-website:ro \
     -v ~/.pi/agent/extensions/subagent:/root/.pi/agent/extensions/subagent:ro \
     -v ~/.pi/agent/prompts:/root/.pi/agent/prompts:ro \
     -v $(pwd)/.pi/sessions:/root/.pi/agent/sessions \
@@ -82,6 +83,7 @@ else
     -v ~/.gitconfig-github-private.inc:/root/.gitconfig-github-private.inc:ro \
     -v ~/.pi/agent/models.json:/root/.pi/agent/models.json:ro \
     -v ~/.pi/agent/agents:/root/.pi/agent/agents:ro \
+    -v ~/.pi/agent/extensions/read-website:/root/.pi/agent/extensions/read-website:ro \
     -v ~/.pi/agent/extensions/subagent:/root/.pi/agent/extensions/subagent:ro \
     -v ~/.pi/agent/prompts:/root/.pi/agent/prompts:ro \
     -v $(pwd)/.pi/sessions:/root/.pi/agent/sessions \
