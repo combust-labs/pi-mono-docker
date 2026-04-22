@@ -123,18 +123,6 @@ fi
 
 while (( "$#" )); do
     case "${1}" in
-        --model)
-            use_model="${2}"
-            shift 2
-            ;;
-        --provider)
-            use_provider="${2}"
-            shift 2
-            ;;
-        --system-prompt)
-            use_system_prompt="${2}"
-            shift 2
-            ;;
         --append-system-prompt)
             use_append_system_prompt+=("${2}")
             shift 2
@@ -143,72 +131,12 @@ while (( "$#" )); do
             use_continue=1
             shift
             ;;
-        --resume|-r)
-            use_resume=1
-            shift
-            ;;
-        --no-session)
-            use_no_session=1
-            shift
-            ;;
-        --verbose)
-            use_verbose=1
-            shift
-            ;;
-        --offline)
-            use_offline=1
-            shift
-            ;;
-        --no-tools)
-            use_no_tools=1
-            shift
-            ;;
-        --no-extensions|-ne)
-            use_no_extensions=1
-            shift
-            ;;
-        --no-skills|-ns)
-            use_no_skills=1
-            shift
-            ;;
-        --no-prompt-templates|-np)
-            use_no_prompt_templates=1
-            shift
-            ;;
-        --no-themes)
-            use_no_themes=1
-            shift
-            ;;
-        --no-context-files|-nc)
-            use_no_context_files=1
-            shift
-            ;;
-        --print|-p)
-            use_print=1
-            shift
-            ;;
-        --mode)
-            use_mode="${2}"
+        --export)
+            use_export="${2}"
             shift 2
             ;;
-        --session)
-            use_session="${2}"
-            shift 2
-            ;;
-        --session-dir)
-            use_session_dir="${2}"
-            shift 2
-            ;;
-        --tools)
-            use_tools+=("${2}")
-            shift 2
-            ;;
-        --theme)
-            use_theme+=("${2}")
-            shift 2
-            ;;
-        --models)
-            use_models+=("${2}")
+        --extension|-e)
+            use_extension+=("${2}")
             shift 2
             ;;
         --list-models)
@@ -221,29 +149,45 @@ while (( "$#" )); do
               shift
             fi
             ;;
-        --export)
-            use_export="${2}"
+        --mode)
+            use_mode="${2}"
             shift 2
             ;;
-        --extension|-e)
-            use_extension+=("${2}")
+        --model)
+            use_model="${2}"
             shift 2
             ;;
-        --skill)
-            use_skill+=("${2}")
-            shift 2
+        --no-context-files|-nc)
+            use_no_context_files=1
+            shift
             ;;
-        --prompt-template)
-            use_prompt_template+=("${2}")
-            shift 2
+        --no-extensions|-ne)
+            use_no_extensions=1
+            shift
             ;;
-        --thinking)
-            use_thinking="${2}"
-            shift 2
+        --no-prompt-templates|-np)
+            use_no_prompt_templates=1
+            shift
             ;;
-        --prompt)
-            use_prompt="${2}"
-            shift 2
+        --no-session)
+            use_no_session=1
+            shift
+            ;;
+        --no-skills|-ns)
+            use_no_skills=1
+            shift
+            ;;
+        --no-themes)
+            use_no_themes=1
+            shift
+            ;;
+        --no-tools)
+            use_no_tools=1
+            shift
+            ;;
+        --offline)
+            use_offline=1
+            shift
             ;;
         --port)
           maybe_port="${2}"
@@ -255,6 +199,50 @@ while (( "$#" )); do
             exit 1
           fi
           ;;
+        --print|-p)
+            use_print=1
+            shift
+            ;;
+        --prompt)
+            use_prompt="${2}"
+            shift 2
+            ;;
+        --provider)
+            use_provider="${2}"
+            shift 2
+            ;;
+        --resume|-r)
+            use_resume=1
+            shift
+            ;;
+        --session)
+            use_session="${2}"
+            shift 2
+            ;;
+        --session-dir)
+            use_session_dir="${2}"
+            shift 2
+            ;;
+        --skill)
+            use_skill+=("${2}")
+            shift 2
+            ;;
+        --system-prompt)
+            use_system_prompt="${2}"
+            shift 2
+            ;;
+        --theme)
+            use_theme+=("${2}")
+            shift 2
+            ;;
+        --thinking)
+            use_thinking="${2}"
+            shift 2
+            ;;
+        --tools)
+            use_tools+=("${2}")
+            shift 2
+            ;;
         --version)
             use_version="${2}"
             shift 2
