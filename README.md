@@ -65,6 +65,9 @@ The `ppi` script supports the following flags:
 | `--models <patterns>` | (empty) | Model cycling patterns |
 | `--list-models [search]` | (empty) | List available models (optional search term) |
 | `--export <file>` | (empty) | Export session to HTML |
+| `--extension <path>`, `-e` | (empty) | Load extension file (allows multiple) |
+| `--skill <path>` | (empty) | Load skill file/directory (allows multiple) |
+| `--prompt-template <path>` | (empty) | Load prompt template (allows multiple) |
 
 ### Boolean Flags
 | Flag | Description |
@@ -112,9 +115,6 @@ The following `pi` flags are not yet exposed through `ppi`:
 - `--print`, `-p` – Non‑interactive mode
 - `--session <path|id>` – Use specific session
 - `--fork <path|id>` – Fork a session
-- `--extension`, `-e` – Load extension file
-- `--skill <path>` – Load skill file/directory
-- `--prompt-template <path>` – Load prompt template
 - `--help`, `-h` – Show help
 - `--version`, `-v` – Show version
 

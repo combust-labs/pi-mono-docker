@@ -29,6 +29,9 @@ use_theme=""
 use_models=""
 use_list_models=""
 use_export=""
+use_extension=()
+use_skill=()
+use_prompt_template=()
 # Default version
 use_version=v0.67.6
 # Override if Containerfile exists
@@ -182,6 +185,18 @@ while (( "$#" )); do
             use_export="${2}"
             shift 2
             ;;
+        --extension|-e)
+            use_extension+=("${2}")
+            shift 2
+            ;;
+        --skill)
+            use_skill+=("${2}")
+            shift 2
+            ;;
+        --prompt-template)
+            use_prompt_template+=("${2}")
+            shift 2
+            ;;
         --thinking)
             use_thinking="${2}"
             shift 2
@@ -222,6 +237,22 @@ if [[ -n "${use_mode}" ]] && ! is_valid_mode "${use_mode}"; then
   echo "Warning: Invalid mode \"${use_mode}\". Valid values: text, json" >&2
   use_mode=""
 fi
+
+# Build multi-occurrence flags
+_extension_flags=""
+for ext in "${use_extension[@]}"; do
+  _extension_flags="${_extension_flags}--extension \"${ext}\" "
+done
+
+_skill_flags=""
+for sk in "${use_skill[@]}"; do
+  _skill_flags="${_skill_flags}--skill \"${sk}\" "
+done
+
+_prompt_template_flags=""
+for pt in "${use_prompt_template[@]}"; do
+  _prompt_template_flags="${_prompt_template_flags}--prompt-template \"${pt}\" "
+done
 
 if (( use_port >= 1  )); then
 
@@ -276,6 +307,9 @@ else
         ${use_models:+--models "${use_models}"} \
         ${use_list_models:+--list-models${use_list_models:+" ${use_list_models}"}} \
         ${use_export:+--export "${use_export}"} \
+        ${_extension_flags} \
+        ${_skill_flags} \
+        ${_prompt_template_flags} \
         "${use_prompt}"
     
 fi
