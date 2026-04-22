@@ -323,7 +323,7 @@ if (( use_port >= 1  )); then
     -v $(pwd):/code \
     -e PORT=${use_port} \
     --entrypoint /opt/agent/pi-mono/node_modules/pi-rpc-http-server/bin/run.sh \
-    "localhost/pi-mono:${use_version}"
+    "localhost/pi-mono:${use_version}" --mode rpc
 
 else
 
@@ -391,6 +391,6 @@ EOF
     -v ~/.pi/agent/prompts:/root/.pi/agent/prompts:ro \
     -v "${use_host_session_dir}:${use_session_dir}" \
     -v "$(pwd):/code" \
-    "localhost/pi-mono:${use_version}"
+    "localhost/pi-mono:${use_version}" --mode interactive
     
 fi
