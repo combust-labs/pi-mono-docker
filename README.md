@@ -60,7 +60,8 @@ The `ppi` script supports the following flags:
 | `--version <v>` | from Containerfile | Override pi‑mono container version |
 | `--mode <text|json>` | `text` | Output mode (rpc value is disallowed) |
 | `--session <path|id>` | (empty) | Use specific session |
-| `--session-dir <dir>` | (empty) | Session storage directory |
+| `--session-dir <dir>` | `/sessions` | Session storage directory (container path) |
+| `--host-sessions-dir <dir>` | `$(pwd)/.pi/sessions` | Host directory to mount as /sessions volume |
 | `--tools <tools>` | (empty) | Tool allowlist (allows multiple) |
 | `--theme <path>` | (empty) | Load theme file/directory (allows multiple) |
 | `--models <patterns>` | (empty) | Model cycling patterns (allows multiple) |

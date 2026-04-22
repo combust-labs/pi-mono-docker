@@ -31,7 +31,7 @@ COPY pi /opt/agent/pi-mono/packages/coding-agent/dist/pi
 
 RUN chmod 0755 /opt/agent/pi-mono/packages/coding-agent/dist/pi
 
-VOLUME ["/code"]
+VOLUME ["/code", "/sessions"]
 
 WORKDIR /code
 

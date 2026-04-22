@@ -50,8 +50,10 @@ use_provider=""
 use_resume=0
 # Use specific session
 use_session=""
-# Session storage directory
-use_session_dir="$(pwd)/.pi/sessions"
+# Session storage directory (container path for pi)
+use_session_dir="/sessions"
+# Host session directory (source mount for /sessions volume)
+use_host_session_dir="$(pwd)/.pi/sessions"
 # Load skill file/directory (allows multiple)
 use_skill=()
 # System prompt (default: coding assistant prompt)
@@ -116,9 +118,9 @@ is_flag() {
   [[ "${arg}" == --* ]] || [[ "${arg}" == -* ]]
 }
 
-if [ ! -d "${use_session_dir}" ]; then
-  mkdir -p "${use_session_dir}"
-  touch "${use_session_dir}/.gitkeep"
+if [ ! -d "${use_host_session_dir}" ]; then
+  mkdir -p "${use_host_session_dir}"
+  touch "${use_host_session_dir}/.gitkeep"
 fi
 
 while (( "$#" )); do
@@ -247,6 +249,10 @@ while (( "$#" )); do
             use_version="${2}"
             shift 2
             ;;
+        --host-sessions-dir)
+            use_host_session_dir="${2}"
+            shift 2
+            ;;
         -*)
             echo "Error: Unsupported flag ${1}" >&2
             exit 1
@@ -313,7 +319,7 @@ if (( use_port >= 1  )); then
     -v ~/.pi/agent/extensions/read-website:/root/.pi/agent/extensions/read-website:ro \
     -v ~/.pi/agent/extensions/subagent:/root/.pi/agent/extensions/subagent:ro \
     -v ~/.pi/agent/prompts:/root/.pi/agent/prompts:ro \
-    -v $(pwd)/.pi/sessions:/root/.pi/agent/sessions \
+    -v ${use_host_session_dir}:${use_session_dir} \
     -v $(pwd):/code \
     -e PORT=${use_port} \
     --entrypoint /opt/agent/pi-mono/node_modules/pi-rpc-http-server/bin/run.sh \
@@ -329,7 +335,7 @@ else
     -v ~/.pi/agent/extensions/read-website:/root/.pi/agent/extensions/read-website:ro \
     -v ~/.pi/agent/extensions/subagent:/root/.pi/agent/extensions/subagent:ro \
     -v ~/.pi/agent/prompts:/root/.pi/agent/prompts:ro \
-    -v $(pwd)/.pi/sessions:/root/.pi/agent/sessions \
+    -v ${use_host_session_dir}:${use_session_dir} \
     -v $(pwd):/code \
     "localhost/pi-mono:${use_version}" \
         --model "${use_model}" \
