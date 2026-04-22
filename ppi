@@ -23,6 +23,7 @@ use_no_prompt_templates=0
 use_no_themes=0
 use_no_context_files=0
 use_mode=""
+use_session=""
 use_session_dir=""
 use_tools=()
 use_theme=()
@@ -158,6 +159,10 @@ while (( "$#" )); do
             ;;
         --mode)
             use_mode="${2}"
+            shift 2
+            ;;
+        --session)
+            use_session="${2}"
             shift 2
             ;;
         --session-dir)
@@ -327,6 +332,7 @@ else
         ${use_no_context_files:+--no-context-files} \
         ${use_thinking:+--thinking "${use_thinking}"} \
         ${use_mode:+--mode "${use_mode}"} \
+        ${use_session:+--session "${use_session}"} \
         ${use_session_dir:+--session-dir "${use_session_dir}"} \
         ${_tools_flags} \
         ${_theme_flags} \

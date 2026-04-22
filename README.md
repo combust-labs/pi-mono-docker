@@ -59,6 +59,7 @@ The `ppi` script supports the following flags:
 | `--port <n>` | (CLI mode) | Start HTTP‑RPC server on port `n` |
 | `--version <v>` | from Containerfile | Override pi‑mono container version |
 | `--mode <text|json>` | `text` | Output mode (rpc value is disallowed) |
+| `--session <path|id>` | (empty) | Use specific session |
 | `--session-dir <dir>` | (empty) | Session storage directory |
 | `--tools <tools>` | (empty) | Tool allowlist (allows multiple) |
 | `--theme <path>` | (empty) | Load theme file/directory (allows multiple) |
@@ -113,7 +114,6 @@ ppi --port 3000 --model gpt-4o
 The following `pi` flags are not yet exposed through `ppi`:
 
 - `--api-key` – API key (use environment variables instead)
-- `--session <path|id>` – Use specific session
 - `--fork <path|id>` – Fork a session
 - `--help`, `-h` – Show help
 - `--version`, `-v` – Show version
