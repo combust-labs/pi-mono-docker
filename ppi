@@ -15,6 +15,7 @@ use_resume=0
 use_no_session=0
 use_verbose=0
 use_offline=0
+use_thinking=""
 # Default version
 use_version=v0.67.6
 # Override if Containerfile exists
@@ -33,6 +34,19 @@ is_port() {
       fi
   fi
   return 1 # Invalid
+}
+
+# Function to validate thinking level
+is_valid_thinking() {
+  local level=$1
+  case "$level" in
+    off|minimal|low|medium|high|xhigh)
+      return 0 # Valid
+      ;;
+    *)
+      return 1 # Invalid
+      ;;
+  esac
 }
 
 if [ ! -d "$(pwd)/.pi/sessions" ]; then
@@ -78,6 +92,10 @@ while (( "$#" )); do
             use_offline=1
             shift
             ;;
+        --thinking)
+            use_thinking="${2}"
+            shift 2
+            ;;
         --prompt)
             use_prompt="${2}"
             shift 2
@@ -102,6 +120,12 @@ while (( "$#" )); do
             ;;
     esac
 done
+
+# Validate thinking level if provided
+if [[ -n "${use_thinking}" ]] && ! is_valid_thinking "${use_thinking}"; then
+  echo "Warning: Invalid thinking level \"${use_thinking}\". Valid values: off, minimal, low, medium, high, xhigh" >&2
+  use_thinking=""
+fi
 
 if (( use_port >= 1  )); then
 
@@ -142,6 +166,7 @@ else
         ${use_no_session:+--no-session} \
         ${use_verbose:+--verbose} \
         ${use_offline:+--offline} \
+        ${use_thinking:+--thinking "${use_thinking}"} \
         "${use_prompt}"
     
 fi
