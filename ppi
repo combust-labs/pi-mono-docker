@@ -7,6 +7,11 @@ base=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 use_port=0
 use_model=${PI_DEFAULT_MODEL:-"gpt-oss-120b-MXFP4-Q8"}
 use_prompt=${PI_DEFAULT_PROMPT:-"Summarize current the project"}
+use_provider=""
+use_system_prompt=""
+use_append_system_prompt=""
+use_continue=0
+use_resume=0
 # Default version
 use_version=v0.67.6
 # Override if Containerfile exists
@@ -37,6 +42,26 @@ while (( "$#" )); do
         --model)
             use_model="${2}"
             shift 2
+            ;;
+        --provider)
+            use_provider="${2}"
+            shift 2
+            ;;
+        --system-prompt)
+            use_system_prompt="${2}"
+            shift 2
+            ;;
+        --append-system-prompt)
+            use_append_system_prompt="${2}"
+            shift 2
+            ;;
+        --continue)
+            use_continue=1
+            shift
+            ;;
+        --resume)
+            use_resume=1
+            shift
             ;;
         --prompt)
             use_prompt="${2}"
@@ -92,6 +117,13 @@ else
     -v ~/.pi/agent/prompts:/root/.pi/agent/prompts:ro \
     -v $(pwd)/.pi/sessions:/root/.pi/agent/sessions \
     -v $(pwd):/code \
-    "localhost/pi-mono:${use_version}" --model "${use_model}" "${use_prompt}"
+    "localhost/pi-mono:${use_version}" \
+        --model "${use_model}" \
+        ${use_provider:+--provider "${use_provider}"} \
+        ${use_system_prompt:+--system-prompt "${use_system_prompt}"} \
+        ${use_append_system_prompt:+--append-system-prompt "${use_append_system_prompt}"} \
+        ${use_continue:+--continue} \
+        ${use_resume:+--resume} \
+        "${use_prompt}"
     
 fi
