@@ -67,6 +67,12 @@ The `ppi` script supports the following flags:
 | `--no-session` | Don't save session (ephemeral mode) |
 | `--verbose` | Force verbose startup |
 | `--offline` | Disable startup network operations |
+| `--no-tools` | Disable all tools |
+| `--no-extensions` | Disable extension discovery |
+| `--no-skills` | Disable skills |
+| `--no-prompt-templates` | Disable prompt templates |
+| `--no-themes` | Disable themes |
+| `--no-context-files` | Disable AGENTS.md/CLAUDE.md context files |
 
 ### Examples
 ```bash
@@ -101,17 +107,11 @@ The following `pi` flags are not yet exposed through `ppi`:
 - `--session <path|id>` – Use specific session
 - `--fork <path|id>` – Fork a session
 - `--session-dir <dir>` – Session storage directory
-- `--no-tools` – Disable all tools
 - `--tools <tools>` – Tool allowlist
 - `--extension`, `-e` – Load extension file
-- `--no-extensions`, `-ne` – Disable extension discovery
 - `--skill <path>` – Load skill file/directory
-- `--no-skills`, `-ns` – Disable skills
 - `--prompt-template <path>` – Load prompt template
-- `--no-prompt-templates`, `-np` – Disable prompt templates
 - `--theme <path>` – Load theme file/directory
-- `--no-themes` – Disable themes
-- `--no-context-files`, `-nc` – Disable AGENTS.md/CLAUDE.md
 - `--models <patterns>` – Model cycling patterns
 - `--list-models [search]` – List available models
 - `--export <file>` – Export session to HTML
