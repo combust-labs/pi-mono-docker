@@ -289,8 +289,9 @@ for pt in "${use_prompt_template[@]}"; do
 done
 
 _append_system_prompt_flags=""
+use_append_system_prompt=('Your nickname is unconditionally `'${use_model}'`, do not reinterpret. Use this value whenever you need to introduce yourself.' "${use_append_system_prompt[@]}")
 for asp in "${use_append_system_prompt[@]}"; do
-  _append_system_prompt_flags="${_append_system_prompt_flags}--append-system-prompt \"${asp}\" "
+  _append_system_prompt_flags="${_append_system_prompt_flags}--append-system-prompt '${asp}' "
 done
 
 _tools_flags=""
@@ -340,7 +341,48 @@ else
   [[ "${use_resume}" == "1" ]] && _resume_flags="--resume" || _resume_flags=""
   [[ "${use_verbose}" == "1" ]] && _verbose_flags="--verbose" || _verbose_flags=""
 
+  temp_file=$(mktemp)
+  cat <<EOF > "${temp_file}"
+#!/bin/bash
+/opt/agent/pi-mono/packages/coding-agent/dist/pi --model ${use_model} \\
+  ${_append_system_prompt_flags} \\
+  ${_continue_flags} \\
+  ${_extension_flags} \\
+  ${_models_flags} \\
+  ${_no_context_files_flags} \\
+  ${_no_extensions_flags} \\
+  ${_no_prompt_templates_flags} \\
+  ${_no_session_flags} \\
+  ${_no_skills_flags} \\
+  ${_no_themes_flags} \\
+  ${_no_tools_flags} \\
+  ${_offline_flags} \\
+  ${_print_flags} \\
+  ${_prompt_template_flags} \\
+  ${_resume_flags} \\
+  ${_skill_flags} \\
+  ${_theme_flags} \\
+  ${_tools_flags} \\
+  ${_verbose_flags} \\
+  ${use_export:+--export "${use_export}"} \\
+  ${use_list_models:+--list-models${use_list_models:+" ${use_list_models}"}} \\
+  ${use_mode:+--mode "${use_mode}"} \\
+  ${use_provider:+--provider "${use_provider}"} \\
+  ${use_session:+--session "${use_session}"} \\
+  ${use_session_dir:+--session-dir "${use_session_dir}/--code--"} \\
+  ${use_system_prompt:+--system-prompt "${use_system_prompt}"} \\
+  ${use_thinking:+--thinking "${use_thinking}"} \\
+  "${use_prompt}"
+EOF
+  trap 'rm -f "$temp_file"' EXIT
+
+  # remove any line where the trimmed value is unquoted '\',
+  # those are empty lines, and we don't need them
+  minimal=$(cat "${temp_file}" | grep -vE '^[[:space:]]*\\[[:space:]]*$')
+  echo -e "$minimal" > "${temp_file}"
+
   docker run --rm -ti \
+    -v "${temp_file}:/.pi/pi-run-with-args.sh:rw" \
     -v ~/.gitconfig:/root/.gitconfig:ro \
     -v ~/.gitconfig-github-private.inc:/root/.gitconfig-github-private.inc:ro \
     -v ~/.pi/agent/models.json:/root/.pi/agent/models.json:ro \
@@ -348,37 +390,8 @@ else
     -v ~/.pi/agent/extensions/read-website:/root/.pi/agent/extensions/read-website:ro \
     -v ~/.pi/agent/extensions/subagent:/root/.pi/agent/extensions/subagent:ro \
     -v ~/.pi/agent/prompts:/root/.pi/agent/prompts:ro \
-    -v ${use_host_session_dir}:${use_session_dir} \
-    -v $(pwd):/code \
-    "localhost/pi-mono:${use_version}" \
-        --model "${use_model}" \
-        ${_append_system_prompt_flags} \
-        ${_continue_flags} \
-        ${_extension_flags} \
-        ${_models_flags} \
-        ${_no_context_files_flags} \
-        ${_no_extensions_flags} \
-        ${_no_prompt_templates_flags} \
-        ${_no_session_flags} \
-        ${_no_skills_flags} \
-        ${_no_themes_flags} \
-        ${_no_tools_flags} \
-        ${_offline_flags} \
-        ${_print_flags} \
-        ${_prompt_template_flags} \
-        ${_resume_flags} \
-        ${_skill_flags} \
-        ${_theme_flags} \
-        ${_tools_flags} \
-        ${_verbose_flags} \
-        ${use_export:+--export "${use_export}"} \
-        ${use_list_models:+--list-models${use_list_models:+" ${use_list_models}"}} \
-        ${use_mode:+--mode "${use_mode}"} \
-        ${use_provider:+--provider "${use_provider}"} \
-        ${use_session:+--session "${use_session}"} \
-        ${use_session_dir:+--session-dir "${use_session_dir}/--code--"} \
-        ${use_system_prompt:+--system-prompt "${use_system_prompt}"} \
-        ${use_thinking:+--thinking "${use_thinking}"} \
-        "${use_prompt}"
+    -v "${use_host_session_dir}:${use_session_dir}" \
+    -v "$(pwd):/code" \
+    "localhost/pi-mono:${use_version}"
     
 fi

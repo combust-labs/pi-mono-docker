@@ -28,11 +28,13 @@ RUN mkdir -p /root/.local/bin \
 #   fi
 
 COPY pi /opt/agent/pi-mono/packages/coding-agent/dist/pi
+COPY pi-run.sh /.pi/pi-run.sh
 
-RUN chmod 0755 /opt/agent/pi-mono/packages/coding-agent/dist/pi
+RUN chmod 0755 /opt/agent/pi-mono/packages/coding-agent/dist/pi \
+  && chmod 0755 /.pi/pi-run.sh
 
-VOLUME ["/code", "/sessions"]
+VOLUME [".pi", "/code", "/sessions"]
 
 WORKDIR /code
 
-ENTRYPOINT ["pi"]
+ENTRYPOINT ["/.pi/pi-run.sh"]
