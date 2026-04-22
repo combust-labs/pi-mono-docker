@@ -22,6 +22,13 @@ use_no_skills=0
 use_no_prompt_templates=0
 use_no_themes=0
 use_no_context_files=0
+use_mode=""
+use_session_dir=""
+use_tools=""
+use_theme=""
+use_models=""
+use_list_models=""
+use_export=""
 # Default version
 use_version=v0.67.6
 # Override if Containerfile exists
@@ -53,6 +60,25 @@ is_valid_thinking() {
       return 1 # Invalid
       ;;
   esac
+}
+
+# Function to validate mode
+is_valid_mode() {
+  local mode=$1
+  case "$mode" in
+    text|json)
+      return 0 # Valid
+      ;;
+    *)
+      return 1 # Invalid
+      ;;
+  esac
+}
+
+# Function to check if next argument is a flag (starts with -- or -)
+is_flag() {
+  local arg=$1
+  [[ "${arg}" == --* ]] || [[ "${arg}" == -* ]]
 }
 
 if [ ! -d "$(pwd)/.pi/sessions" ]; then
@@ -122,6 +148,40 @@ while (( "$#" )); do
             use_no_context_files=1
             shift
             ;;
+        --mode)
+            use_mode="${2}"
+            shift 2
+            ;;
+        --session-dir)
+            use_session_dir="${2}"
+            shift 2
+            ;;
+        --tools)
+            use_tools="${2}"
+            shift 2
+            ;;
+        --theme)
+            use_theme="${2}"
+            shift 2
+            ;;
+        --models)
+            use_models="${2}"
+            shift 2
+            ;;
+        --list-models)
+            # Optional search argument - if next arg is not a flag, use it
+            if (( "$#" > 1 )) && ! is_flag "${2}"; then
+              use_list_models="${2}"
+              shift 2
+            else
+              use_list_models="1"
+              shift
+            fi
+            ;;
+        --export)
+            use_export="${2}"
+            shift 2
+            ;;
         --thinking)
             use_thinking="${2}"
             shift 2
@@ -155,6 +215,12 @@ done
 if [[ -n "${use_thinking}" ]] && ! is_valid_thinking "${use_thinking}"; then
   echo "Warning: Invalid thinking level \"${use_thinking}\". Valid values: off, minimal, low, medium, high, xhigh" >&2
   use_thinking=""
+fi
+
+# Validate mode if provided (disallow rpc)
+if [[ -n "${use_mode}" ]] && ! is_valid_mode "${use_mode}"; then
+  echo "Warning: Invalid mode \"${use_mode}\". Valid values: text, json" >&2
+  use_mode=""
 fi
 
 if (( use_port >= 1  )); then
@@ -203,6 +269,13 @@ else
         ${use_no_themes:+--no-themes} \
         ${use_no_context_files:+--no-context-files} \
         ${use_thinking:+--thinking "${use_thinking}"} \
+        ${use_mode:+--mode "${use_mode}"} \
+        ${use_session_dir:+--session-dir "${use_session_dir}"} \
+        ${use_tools:+--tools "${use_tools}"} \
+        ${use_theme:+--theme "${use_theme}"} \
+        ${use_models:+--models "${use_models}"} \
+        ${use_list_models:+--list-models${use_list_models:+" ${use_list_models}"}} \
+        ${use_export:+--export "${use_export}"} \
         "${use_prompt}"
     
 fi

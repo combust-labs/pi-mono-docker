@@ -58,6 +58,13 @@ The `ppi` script supports the following flags:
 | `--thinking <level>` | (empty) | Thinking level: `off`, `minimal`, `low`, `medium`, `high`, `xhigh` |
 | `--port <n>` | (CLI mode) | Start HTTP‑RPC server on port `n` |
 | `--version <v>` | from Containerfile | Override pi‑mono container version |
+| `--mode <text|json>` | `text` | Output mode (rpc value is disallowed) |
+| `--session-dir <dir>` | (empty) | Session storage directory |
+| `--tools <tools>` | (empty) | Tool allowlist |
+| `--theme <path>` | (empty) | Load theme file/directory |
+| `--models <patterns>` | (empty) | Model cycling patterns |
+| `--list-models [search]` | (empty) | List available models (optional search term) |
+| `--export <file>` | (empty) | Export session to HTML |
 
 ### Boolean Flags
 | Flag | Description |
@@ -102,19 +109,12 @@ ppi --port 3000 --model gpt-4o
 The following `pi` flags are not yet exposed through `ppi`:
 
 - `--api-key` – API key (use environment variables instead)
-- `--mode <text|json|rpc>` – Output mode (default: text)
 - `--print`, `-p` – Non‑interactive mode
 - `--session <path|id>` – Use specific session
 - `--fork <path|id>` – Fork a session
-- `--session-dir <dir>` – Session storage directory
-- `--tools <tools>` – Tool allowlist
 - `--extension`, `-e` – Load extension file
 - `--skill <path>` – Load skill file/directory
 - `--prompt-template <path>` – Load prompt template
-- `--theme <path>` – Load theme file/directory
-- `--models <patterns>` – Model cycling patterns
-- `--list-models [search]` – List available models
-- `--export <file>` – Export session to HTML
 - `--help`, `-h` – Show help
 - `--version`, `-v` – Show version
 
