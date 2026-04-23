@@ -27,8 +27,14 @@ RUN mkdir -p /root/.local/bin \
 #   export PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser ; \
 #   fi
 
+RUN mkdir -p /root/.config/pnpm /root/.config/uv
+
 COPY pi /opt/agent/pi-mono/packages/coding-agent/dist/pi
 COPY pi-run.sh /.pi/pi-run.sh
+COPY .npmrc /root/.npmrc
+COPY .pnpm-rc /root/.config/pnpm/rc
+COPY .bunfig.toml /root/.bunfig.toml
+COPY .config-uv-uv.toml /root/.config/uv/uv.toml
 
 RUN chmod 0755 /opt/agent/pi-mono/packages/coding-agent/dist/pi \
   && chmod 0755 /.pi/pi-run.sh
