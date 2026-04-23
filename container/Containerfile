@@ -8,36 +8,47 @@ ENV PATH="$PATH:/root/.local/bin:/opt/agent/pi-mono/packages/coding-agent/dist" 
   PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
   PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
 
-RUN mkdir -p /root/.local/bin \
-  && apt update \
-  && apt install -y fd-find ripgrep unzip zip \
-  && ln -s $(which fdfind) /root/.local/bin/fd \
-  && mkdir -p /opt/agent/pi-mono \
-  && cd /opt/agent/pi-mono \
-  && git clone ${PI_MONO_GIT_REPO} . \
-  && git checkout ${PI_MONO_VERSION} \
-  && npm install \
-  && npm run build \
-  && npm install --save "git://github.com/combust-labs/pi-mono-http-proxy.git#3ec12f7e68f0578369935810b669d08638e9d371" \
-  && chmod 0755 /opt/agent/pi-mono/node_modules/pi-rpc-http-server/bin/run.sh \
-  && curl -fsSL https://get.pnpm.io/install.sh | bash -
-# RUN if [ "$(uname -m)" = "aarch64" ] ; then \
-#   apt-get install -y chromium ; \
-#   export PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true ; \
-#   export PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser ; \
-#   fi
-
-RUN mkdir -p /root/.config/pnpm /root/.config/uv
-
-COPY pi /opt/agent/pi-mono/packages/coding-agent/dist/pi
+# Entrypoint:
 COPY pi-run.sh /.pi/pi-run.sh
+# The binary used to start the pi cli:
+COPY pi /.pi/pi
+# Package manager minimum release age configurations:
 COPY .npmrc /root/.npmrc
 COPY .pnpm-rc /root/.config/pnpm/rc
 COPY .bunfig.toml /root/.bunfig.toml
 COPY .config-uv-uv.toml /root/.config/uv/uv.toml
 
-RUN chmod 0755 /opt/agent/pi-mono/packages/coding-agent/dist/pi \
-  && chmod 0755 /.pi/pi-run.sh
+RUN mkdir -p ~/.local/bin \
+  && apt update \
+  && apt install -y curl fd-find ripgrep tree unzip zip \
+  && ln -s "$(which fdfind)" ~/.local/bin/fd \
+  && mkdir -p /opt/agent/pi-mono \
+  && cd /opt/agent/pi-mono \
+  && git clone "${PI_MONO_GIT_REPO}" . \
+  && git checkout "${PI_MONO_VERSION}" \
+  && echo " => install pi-mono dependencies" \
+  && npm install \
+  && echo " => build pi-mono" \
+  && npm run build \
+  && echo " => making required programs executable" \
+  && chmod 0755 /.pi/pi-run.sh \
+  && mv -v /.pi/pi /opt/agent/pi-mono/packages/coding-agent/dist/pi \
+  && chmod 0755 /opt/agent/pi-mono/packages/coding-agent/dist/pi \
+  && echo " => installing pi-mono-http-proxy" \
+  && mv ~/.npmrc ~/.npmrc.bak \
+  && npm install --save "git://github.com/combust-labs/pi-mono-http-proxy.git#3ec12f7e68f0578369935810b669d08638e9d371" \
+  && mv ~/.npmrc.bak ~/.npmrc \
+  && chmod 0755 /opt/agent/pi-mono/node_modules/pi-rpc-http-server/bin/run.sh \
+  && echo " => install bun" \
+  && curl -fsSL https://bun.com/install | bash \
+  && echo " => install pnpm" \
+  && curl -fsSL https://get.pnpm.io/install.sh | bash -
+
+# RUN if [ "$(uname -m)" = "aarch64" ] ; then \
+#   apt-get install -y chromium ; \
+#   export PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true ; \
+#   export PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser ; \
+#   fi
 
 VOLUME [".pi", "/code", "/sessions"]
 
