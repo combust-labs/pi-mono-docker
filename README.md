@@ -125,6 +125,22 @@ ppi --ppi-host-attach-prompts --ppi-host-attach-agents --ppi-host-attach-models-
 ppi --ppi-host-add-path /path/to/config:/root/.config:ro --ppi-host-add-path /path/to/data:/data:rw "Process data"
 ```
 
+By default, `ppi` doesn't mount any `pi` configuration from the host. If your `ppi` invocations involve a wider number of flags, you may want to create a `bash` function to apply them automatically. For example:
+
+```bash
+function ppi {
+  "${HOME}/.local/bin/ppi" \
+    --ppi-host-attach-models-json \
+    --ppi-host-attach-agents \
+    --ppi-host-attach-prompts \
+    --ppi-host-add-path "${HOME}/.gitconfig:/root/.gitconfig:ro" \
+    --ppi-host-add-path "${HOME}/.gitconfig-github-private.inc:/root/.gitconfig-github-private.inc:ro" \
+    --ppi-host-add-path "${HOME}/.pi/agent/extensions/read-website:/root/.pi/agent/extensions/read-website:ro" \
+    --ppi-host-add-path "${HOME}/.pi/agent/extensions/subagent:/root/.pi/agent/extensions/subagent:ro" \
+    "$@"
+}
+```
+
 ---
 
 ## Unsupported `pi` Flags
