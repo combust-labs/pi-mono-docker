@@ -85,6 +85,9 @@ The `ppi` script supports the following flags:
 | `--no-prompt-templates`, `-np` | Disable prompt templates |
 | `--no-themes` | Disable themes |
 | `--no-context-files`, `-nc` | Disable AGENTS.md/CLAUDE.md context files |
+| `--ppi-host-attach-prompts` | Attach prompts directory to container |
+| `--ppi-host-attach-agents` | Attach agents directory to container |
+| `--ppi-host-attach-models-json` | Attach models.json file to container |
 
 ### Default Nickname Injection
 
@@ -113,6 +116,9 @@ ppi --system-prompt "You are a code reviewer" --prompt "Review PR #123"
 
 # Start RPC server on port 3000
 ppi --port 3000 --model gpt-4o
+
+# With prompts, agents and models.json directories attached
+ppi --ppi-host-attach-prompts --ppi-host-attach-agents --ppi-host-attach-models-json "Analyze this code"
 ```
 
 ---

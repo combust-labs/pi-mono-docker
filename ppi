@@ -66,6 +66,14 @@ use_thinking=""
 use_tools=()
 # Force verbose startup
 use_verbose=0
+# Path to models.json file
+# use_ppi_host_models_json=
+# Attach prompts directory
+use_ppi_host_attach_prompts=0
+# Attach agents directory
+use_ppi_host_attach_agents=0
+# Attach models.json file from host
+use_ppi_host_attach_models_json=0
 # pi-mono container version
 use_version=v0.67.6
 # Override if Containerfile exists
@@ -252,6 +260,18 @@ while (( "$#" )); do
             use_host_session_dir="${2}"
             shift 2
             ;;
+        --ppi-host-attach-models-json)
+            use_ppi_host_attach_models_json=1
+            shift
+            ;;
+        --ppi-host-attach-prompts)
+            use_ppi_host_attach_prompts=1
+            shift
+            ;;
+        --ppi-host-attach-agents)
+            use_ppi_host_attach_agents=1
+            shift
+            ;;
         -*)
             echo "Error: Unsupported flag ${1}" >&2
             exit 1
@@ -308,17 +328,22 @@ for md in "${use_models[@]}"; do
   _models_flags="${_models_flags}--models \"${md}\" "
 done
 
+# Conditional volume mounts for ppi-host-attach flags
+[[ "${use_ppi_host_attach_prompts}" == "1" ]] && _ppi_host_attach_prompts_vol="-v ~/.pi/agent/prompts:/root/.pi/agent/prompts:ro" || _ppi_host_attach_prompts_vol=""
+[[ "${use_ppi_host_attach_agents}" == "1" ]] && _ppi_host_attach_agents_vol="-v ~/.pi/agent/agents:/root/.pi/agent/agents:ro" || _ppi_host_attach_agents_vol=""
+[[ "${use_ppi_host_attach_models_json}" == "1" ]] && _ppi_host_attach_models_json_vol="-v ~/.pi/agent/models.json:/root/.pi/agent/models.json:ro" || _ppi_host_attach_models_json_vol=""
+
 if (( use_port >= 1  )); then
 
   docker run --rm -ti \
     -p 3000:3000 \
     -v ~/.gitconfig:/root/.gitconfig:ro \
     -v ~/.gitconfig-github-private.inc:/root/.gitconfig-github-private.inc:ro \
-    -v ~/.pi/agent/models.json:/root/.pi/agent/models.json:ro \
-    -v ~/.pi/agent/agents:/root/.pi/agent/agents:ro \
+    ${_ppi_host_attach_models_json_vol} \
+    ${_ppi_host_attach_agents_vol} \
+    ${_ppi_host_attach_prompts_vol} \
     -v ~/.pi/agent/extensions/read-website:/root/.pi/agent/extensions/read-website:ro \
     -v ~/.pi/agent/extensions/subagent:/root/.pi/agent/extensions/subagent:ro \
-    -v ~/.pi/agent/prompts:/root/.pi/agent/prompts:ro \
     -v ${use_host_session_dir}:${use_session_dir} \
     -v $(pwd):/code \
     -e PORT=${use_port} \
@@ -384,11 +409,11 @@ EOF
     -v "${temp_file}:/.pi/pi-run-with-args.sh:rw" \
     -v ~/.gitconfig:/root/.gitconfig:ro \
     -v ~/.gitconfig-github-private.inc:/root/.gitconfig-github-private.inc:ro \
-    -v ~/.pi/agent/models.json:/root/.pi/agent/models.json:ro \
-    -v ~/.pi/agent/agents:/root/.pi/agent/agents:ro \
+    ${_ppi_host_attach_models_json_vol} \
+    ${_ppi_host_attach_agents_vol} \
+    ${_ppi_host_attach_prompts_vol} \
     -v ~/.pi/agent/extensions/read-website:/root/.pi/agent/extensions/read-website:ro \
     -v ~/.pi/agent/extensions/subagent:/root/.pi/agent/extensions/subagent:ro \
-    -v ~/.pi/agent/prompts:/root/.pi/agent/prompts:ro \
     -v "${use_host_session_dir}:${use_session_dir}" \
     -v "$(pwd):/code" \
     "localhost/pi-mono:${use_version}" --mode interactive

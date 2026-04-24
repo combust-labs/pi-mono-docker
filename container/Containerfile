@@ -13,10 +13,10 @@ COPY pi-run.sh /.pi/pi-run.sh
 # The binary used to start the pi cli:
 COPY pi /.pi/pi
 # Package manager minimum release age configurations:
-COPY .npmrc /root/.npmrc
-COPY .pnpm-rc /root/.config/pnpm/rc
-COPY .bunfig.toml /root/.bunfig.toml
-COPY .config-uv-uv.toml /root/.config/uv/uv.toml
+COPY .npmrc /.pi/dotfiles/.npmrc
+COPY .pnpm-rc /.pi/dotfiles/.config/pnpm/rc
+COPY .bunfig.toml /.pi/dotfiles/.bunfig.toml
+COPY .config-uv-uv.toml /.pi/dotfiles/.config/uv/uv.toml
 
 RUN mkdir -p ~/.local/bin \
   && apt update \
@@ -35,14 +35,19 @@ RUN mkdir -p ~/.local/bin \
   && mv -v /.pi/pi /opt/agent/pi-mono/packages/coding-agent/dist/pi \
   && chmod 0755 /opt/agent/pi-mono/packages/coding-agent/dist/pi \
   && echo " => installing pi-mono-http-proxy" \
-  && mv ~/.npmrc ~/.npmrc.bak \
   && npm install --save "git://github.com/combust-labs/pi-mono-http-proxy.git#3ec12f7e68f0578369935810b669d08638e9d371" \
-  && mv ~/.npmrc.bak ~/.npmrc \
   && chmod 0755 /opt/agent/pi-mono/node_modules/pi-rpc-http-server/bin/run.sh \
   && echo " => install bun" \
   && curl -fsSL https://bun.com/install | bash \
   && echo " => install pnpm" \
-  && curl -fsSL https://get.pnpm.io/install.sh | bash -
+  && curl -fsSL https://get.pnpm.io/install.sh | bash - \
+  && echo " => dotfiles" \
+  && mkdir -p ~/.config/pnpm \
+  && mkdir -p ~/.config/uv \
+  && ln -sF /.pi/dotfiles/.bunfig.toml ~/.bunfig.toml \
+  && ln -sF /.pi/dotfiles/.npmrc ~/.npmrc \
+  && ln -sF /.pi/dotfiles/.config/pnpm/rc ~/.config/pnpm/rc \
+  && ln -sF /.pi/dotfiles/.config/uv/uv.toml ~/.config/uv/uv.toml
 
 # RUN if [ "$(uname -m)" = "aarch64" ] ; then \
 #   apt-get install -y chromium ; \
