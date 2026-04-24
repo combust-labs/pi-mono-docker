@@ -1,15 +1,18 @@
 <!-- SPDX-License-Identifier: Apache-2.0 -->
 # pi-mono Docker Build
 
-This repository provides a minimal Docker image that runs the **pi-mono coding-agent** (`pi-mono`).
+This repository provides a comprehensive Docker image that runs the **pi-mono coding-agent** (`pi-mono`).
 
 ## What it contains
 - **`container/Containerfile`** - builds the image from `node:25-trixie`, installs required tools, clones the `pi-mono` source at the pinned version, builds it, and copies the `pi` CLI entry point.
 - **`container/pi-run.sh`** - container entrypoint that delegates to a generated shell script containing all CLI arguments
-- **Makefile** – convenient target `make build-docker` that extracts the version from `container/Containerfile` and runs:
+- **`container/pi`** - helper script copied into the image as the `pi` CLI entry point
+- **`.pnpm-rc`, `.npmrc`, `.bunfig.toml`, `.config-uv-uv.toml`** - configuration files for pnpm, npm, bun, and uv package managers used during image build
+- **`Makefile`** – convenient target `make build-docker` that extracts the version from `container/Containerfile` and runs:
   ```
   docker build --no-cache -t localhost/pi-mono:<version> .
   ```
+- **`ppi`** – helper script on the host that runs the container in CLI mode or HTTP-RPC server mode
 
 ## How to build
 ```bash
@@ -17,9 +20,23 @@ make build-docker   # builds the image with the tag localhost/pi-mono:<version>
 ```
 The `<version>` is taken from the `ARG PI_MONO_VERSION` line in `container/Containerfile` (default `v0.67.6`).
 
+The following build args are supported:
+
+| Build Arg | Default | Description |
+|-----------|---------|-------------|
+| `PI_MONO_VERSION` | `v0.67.6` | Version of pi-mono to clone and build |
+| `PI_RPC_HTTP_SERVER_VERSION` | (empty) | Version of pi-rpc-http-server to install (uses pi-mono version if empty) |
+| `NPM_VERSION` | (empty) | Specific npm version to install (optional) |
+| `NODE_VERSION` | `25` | Node.js version to use (reflected in `node:<VERSION>-trixie` base) |
+
 ## Running the container
 ```bash
-docker run -v $(pwd):/code -e HTTP_PROXY=... -e HTTPS_PROXY=... localhost/pi-mono:<version> <args>
+docker run \
+  -v $(pwd):/code \
+  -e HTTP_PROXY=... \
+  -e HTTPS_PROXY=... \
+  localhost/pi-mono:<version> \
+  <args>
 ```
 Replace `<args>` with any command supported by the coding-agent CLI.
 
@@ -47,51 +64,59 @@ Both modes mount the current project directory at `/code` and bind-mount user co
 
 ## Supported `ppi` Flags
 
-The `ppi` script supports the following flags:
+The `ppi` script supports the following flags, segregated into flags inherited from `pi` and ppi-specific flags.
 
-### String Flags
+### `pi`-supported String Flags
 | Flag | Default | Description |
 |------|---------|-------------|
-| `--model <pattern>` | `gpt-oss-120b-MXFP4-Q8` | Model pattern or ID (supports `provider/id` and optional `:thinking`) |
-| `--provider <name>` | (empty) | Provider name |
-| `--system-prompt <text>` | (empty) | System prompt (default: coding assistant prompt) |
 | `--append-system-prompt <text>` | nickname injection | Append text to system prompt (default: sets agent nickname to model name; allows multiple) |
-| `--prompt <text>` | `Summarize current the project` | Initial prompt to send to the agent |
-| `--thinking <level>` | (empty) | Thinking level: `off`, `minimal`, `low`, `medium`, `high`, `xhigh` |
-| `--mode <text\|json\|rpc>` | `text` | Output mode (`rpc` triggers HTTP-RPC server mode) |
-| `--ppi-container-port <n>` | `3000` | Internal container port (used in `-e PORT` env var) |
-| `--ppi-host-port <n>` | (container port) | Host port exposed to localhost; defaults to container port if not set |
-| `--version <v>` | from Containerfile | Override pi-mono container version |
-| `--session <path\|id>` | (empty) | Use specific session |
-| `--session-dir <dir>` | `/sessions` | Session storage directory (container path) |
-| `--host-sessions-dir <dir>` | `$(pwd)/.pi/sessions` | Host directory to mount as /sessions volume |
-| `--tools <tools>` | (empty) | Tool allowlist (allows multiple) |
-| `--theme <path>` | (empty) | Load theme file/directory (allows multiple) |
-| `--list-models [search]` | enabled | List available models (optional search term; enabled when flag is present) |
 | `--export <file>` | (empty) | Export session to HTML |
 | `--extension <path>`, `-e` | (empty) | Load extension file (allows multiple) |
-| `--skill <path>` | (empty) | Load skill file/directory (allows multiple) |
+| `--list-models [search]` | enabled | List available models (optional search term; enabled when flag is present) |
+| `--mode <text\|json\|rpc>` | `text` | Output mode (`rpc` triggers HTTP-RPC server mode) |
+| `--model <pattern>` | `gpt-oss-120b-MXFP4-Q8` | Model pattern or ID (supports `provider/id` and optional `:thinking`) |
+| `--prompt <text>` | `Summarize current the project` | Initial prompt to send to the agent |
 | `--prompt-template <path>` | (empty) | Load prompt template (allows multiple) |
+| `--provider <name>` | (empty) | Provider name |
+| `--session <path\|id>` | (empty) | Use specific session |
+| `--session-dir <dir>` | `/sessions` | Session storage directory (container path) |
+| `--skill <path>` | (empty) | Load skill file/directory (allows multiple) |
+| `--system-prompt <text>` | (empty) | System prompt (default: coding assistant prompt) |
+| `--theme <path>` | (empty) | Load theme file/directory (allows multiple) |
+| `--thinking <level>` | (empty) | Thinking level: `off`, `minimal`, `low`, `medium`, `high`, `xhigh` |
+| `--tools <tools>` | (empty) | Tool allowlist (allows multiple) |
 
-### Boolean Flags
+### `pi`-supported Boolean Flags
 | Flag | Description |
 |------|-------------|
 | `--continue`, `-c` | Continue previous session |
-| `--resume`, `-r` | Select and resume a session |
+| `--no-context-files`, `-nc` | Disable AGENTS.md/CLAUDE.md context files |
+| `--no-extensions`, `-ne` | Disable extension discovery |
+| `--no-prompt-templates`, `-np` | Disable prompt templates |
 | `--no-session` | Don't save session (ephemeral mode) |
-| `--verbose` | Force verbose startup |
+| `--no-skills`, `-ns` | Disable skills |
+| `--no-themes` | Disable themes |
+| `--no-tools` | Disable all tools |
 | `--offline` | Disable startup network operations |
 | `--print`, `-p` | Non-interactive mode (process prompt and exit) |
-| `--no-tools` | Disable all tools |
-| `--no-extensions`, `-ne` | Disable extension discovery |
-| `--no-skills`, `-ns` | Disable skills |
-| `--no-prompt-templates`, `-np` | Disable prompt templates |
-| `--no-themes` | Disable themes |
-| `--no-context-files`, `-nc` | Disable AGENTS.md/CLAUDE.md context files |
-| `--ppi-host-attach-prompts` | Attach prompts directory to container |
+| `--resume`, `-r` | Select and resume a session |
+| `--verbose` | Force verbose startup |
+
+### ppi-specific String Flags
+| Flag | Default | Description |
+|------|---------|-------------|
+| `--host-sessions-dir <dir>` | `$(pwd)/.pi/sessions` | Host directory to mount as /sessions volume |
+| `--ppi-container-port <n>` | `3000` | Internal container port (used in `-e PORT` env var) |
+| `--ppi-host-add-path <path>` | (empty) | Add custom volume mount (format: `host-path:container-path:rw` or `host-path:container-path:ro`; allows multiple) |
+| `--ppi-host-port <n>` | (container port) | Host port exposed to localhost; defaults to container port if not set |
+| `--version <v>` | from Containerfile | Override pi-mono container version |
+
+### ppi-specific Boolean Flags
+| Flag | Description |
+|------|-------------|
 | `--ppi-host-attach-agents` | Attach agents directory to container |
 | `--ppi-host-attach-models-json` | Attach models.json file to container |
-| `--ppi-host-add-path <path>` | (empty) | Add custom volume mount (format: `host-path:container-path:rw` or `host-path:container-path:ro`; allows multiple) |
+| `--ppi-host-attach-prompts` | Attach prompts directory to container |
 
 ### Default Nickname Injection
 
@@ -104,6 +129,9 @@ This ensures the agent consistently uses the model name as its identity. User-pr
 ### Examples
 ```bash
 # Basic usage with default prompt
+# Note: This call works but is non-functional unless you explicitly provide
+# at least the models.json path via --ppi-host-attach-models-json or a
+# custom mount via --ppi-host-add-path
 ppi
 
 # Custom prompt
