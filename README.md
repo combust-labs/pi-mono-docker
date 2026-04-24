@@ -58,11 +58,11 @@ The `ppi` script supports the following flags:
 | `--append-system-prompt <text>` | nickname injection | Append text to system prompt (default: sets agent nickname to model name; allows multiple) |
 | `--prompt <text>` | `Summarize current the project` | Initial prompt to send to the agent |
 | `--thinking <level>` | (empty) | Thinking level: `off`, `minimal`, `low`, `medium`, `high`, `xhigh` |
-| `--mode <text|json|rpc>` | `text` | Output mode (`rpc` triggers HTTP-RPC server mode) |
+| `--mode <text\|json\|rpc>` | `text` | Output mode (`rpc` triggers HTTP-RPC server mode) |
 | `--ppi-container-port <n>` | `3000` | Internal container port (used in `-e PORT` env var) |
 | `--ppi-host-port <n>` | (container port) | Host port exposed to localhost; defaults to container port if not set |
 | `--version <v>` | from Containerfile | Override pi-mono container version |
-| `--session <path|id>` | (empty) | Use specific session |
+| `--session <path\|id>` | (empty) | Use specific session |
 | `--session-dir <dir>` | `/sessions` | Session storage directory (container path) |
 | `--host-sessions-dir <dir>` | `$(pwd)/.pi/sessions` | Host directory to mount as /sessions volume |
 | `--tools <tools>` | (empty) | Tool allowlist (allows multiple) |
