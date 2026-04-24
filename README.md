@@ -88,7 +88,7 @@ The `ppi` script supports the following flags:
 | `--ppi-host-attach-prompts` | Attach prompts directory to container |
 | `--ppi-host-attach-agents` | Attach agents directory to container |
 | `--ppi-host-attach-models-json` | Attach models.json file to container |
-| `--ppi-host-add-file <path>` | (empty) | Add custom volume mount (format: `host-path:container-path:rw` or `host-path:container-path:ro`; allows multiple) |
+| `--ppi-host-add-path <path>` | (empty) | Add custom volume mount (format: `host-path:container-path:rw` or `host-path:container-path:ro`; allows multiple) |
 
 ### Default Nickname Injection
 
@@ -122,7 +122,7 @@ ppi --port 3000 --model gpt-4o
 ppi --ppi-host-attach-prompts --ppi-host-attach-agents --ppi-host-attach-models-json "Analyze this code"
 
 # With custom volume mounts
-ppi --ppi-host-add-file /path/to/config:/root/.config:ro --ppi-host-add-file /path/to/data:/data:rw "Process data"
+ppi --ppi-host-add-path /path/to/config:/root/.config:ro --ppi-host-add-path /path/to/data:/data:rw "Process data"
 ```
 
 ---

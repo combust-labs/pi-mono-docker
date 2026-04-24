@@ -66,16 +66,18 @@ use_thinking=""
 use_tools=()
 # Force verbose startup
 use_verbose=0
-# Path to models.json file
-# use_ppi_host_models_json=
-# Attach prompts directory
-use_ppi_host_attach_prompts=0
+
+# ppi-specific flags:
+# -------------------
+
+# Additional host files to mount (host-path:container-path:rw|ro)
+use_ppi_host_add_path=()
 # Attach agents directory
 use_ppi_host_attach_agents=0
 # Attach models.json file from host
 use_ppi_host_attach_models_json=0
-# Additional host files to mount (host-path:container-path:rw|ro)
-use_ppi_host_add_file=()
+# Attach prompts directory
+use_ppi_host_attach_prompts=0
 # pi-mono container version
 use_version=v0.67.6
 # Override if Containerfile exists
@@ -254,13 +256,18 @@ while (( "$#" )); do
             use_tools+=("${2}")
             shift 2
             ;;
-        --version)
-            use_version="${2}"
-            shift 2
-            ;;
+        # ppi-specific flags kept separate
         --host-sessions-dir)
             use_host_session_dir="${2}"
             shift 2
+            ;;
+        --ppi-host-add-path)
+            use_ppi_host_add_path+=("${2}")
+            shift 2
+            ;;
+        --ppi-host-attach-agents)
+            use_ppi_host_attach_agents=1
+            shift
             ;;
         --ppi-host-attach-models-json)
             use_ppi_host_attach_models_json=1
@@ -270,12 +277,8 @@ while (( "$#" )); do
             use_ppi_host_attach_prompts=1
             shift
             ;;
-        --ppi-host-attach-agents)
-            use_ppi_host_attach_agents=1
-            shift
-            ;;
-        --ppi-host-add-file)
-            use_ppi_host_add_file+=("${2}")
+        --version)
+            use_version="${2}"
             shift 2
             ;;
         -*)
@@ -339,9 +342,9 @@ done
 [[ "${use_ppi_host_attach_agents}" == "1" ]] && _ppi_host_attach_agents_vol="-v ${HOME}/.pi/agent/agents:/root/.pi/agent/agents:ro" || _ppi_host_attach_agents_vol=""
 [[ "${use_ppi_host_attach_models_json}" == "1" ]] && _ppi_host_attach_models_json_vol="-v ${HOME}/.pi/agent/models.json:/root/.pi/agent/models.json:ro" || _ppi_host_attach_models_json_vol=""
 
-# Build volume mounts for --ppi-host-add-file
+# Build volume mounts for --ppi-host-add-path
 _ppi_host_add_file_vols=""
-for _f in "${use_ppi_host_add_file[@]}"; do
+for _f in "${use_ppi_host_add_path[@]}"; do
   _ppi_host_add_file_vols="${_ppi_host_add_file_vols}-v ${_f} "
 done
 
