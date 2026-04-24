@@ -74,6 +74,8 @@ use_ppi_host_attach_prompts=0
 use_ppi_host_attach_agents=0
 # Attach models.json file from host
 use_ppi_host_attach_models_json=0
+# Additional host files to mount (host-path:container-path:rw|ro)
+use_ppi_host_add_file=()
 # pi-mono container version
 use_version=v0.67.6
 # Override if Containerfile exists
@@ -272,6 +274,10 @@ while (( "$#" )); do
             use_ppi_host_attach_agents=1
             shift
             ;;
+        --ppi-host-add-file)
+            use_ppi_host_add_file+=("${2}")
+            shift 2
+            ;;
         -*)
             echo "Error: Unsupported flag ${1}" >&2
             exit 1
@@ -329,25 +335,27 @@ for md in "${use_models[@]}"; do
 done
 
 # Conditional volume mounts for ppi-host-attach flags
-[[ "${use_ppi_host_attach_prompts}" == "1" ]] && _ppi_host_attach_prompts_vol="-v ~/.pi/agent/prompts:/root/.pi/agent/prompts:ro" || _ppi_host_attach_prompts_vol=""
-[[ "${use_ppi_host_attach_agents}" == "1" ]] && _ppi_host_attach_agents_vol="-v ~/.pi/agent/agents:/root/.pi/agent/agents:ro" || _ppi_host_attach_agents_vol=""
-[[ "${use_ppi_host_attach_models_json}" == "1" ]] && _ppi_host_attach_models_json_vol="-v ~/.pi/agent/models.json:/root/.pi/agent/models.json:ro" || _ppi_host_attach_models_json_vol=""
+[[ "${use_ppi_host_attach_prompts}" == "1" ]] && _ppi_host_attach_prompts_vol="-v ${HOME}/.pi/agent/prompts:/root/.pi/agent/prompts:ro" || _ppi_host_attach_prompts_vol=""
+[[ "${use_ppi_host_attach_agents}" == "1" ]] && _ppi_host_attach_agents_vol="-v ${HOME}/.pi/agent/agents:/root/.pi/agent/agents:ro" || _ppi_host_attach_agents_vol=""
+[[ "${use_ppi_host_attach_models_json}" == "1" ]] && _ppi_host_attach_models_json_vol="-v ${HOME}/.pi/agent/models.json:/root/.pi/agent/models.json:ro" || _ppi_host_attach_models_json_vol=""
+
+# Build volume mounts for --ppi-host-add-file
+_ppi_host_add_file_vols=""
+for _f in "${use_ppi_host_add_file[@]}"; do
+  _ppi_host_add_file_vols="${_ppi_host_add_file_vols}-v ${_f} "
+done
 
 if (( use_port >= 1  )); then
 
   docker run --rm -ti \
     -p 3000:3000 \
-    -v ~/.gitconfig:/root/.gitconfig:ro \
-    -v ~/.gitconfig-github-private.inc:/root/.gitconfig-github-private.inc:ro \
     ${_ppi_host_attach_models_json_vol} \
     ${_ppi_host_attach_agents_vol} \
     ${_ppi_host_attach_prompts_vol} \
-    -v ~/.pi/agent/extensions/read-website:/root/.pi/agent/extensions/read-website:ro \
-    -v ~/.pi/agent/extensions/subagent:/root/.pi/agent/extensions/subagent:ro \
+    ${_ppi_host_add_file_vols} \
     -v ${use_host_session_dir}:${use_session_dir} \
     -v $(pwd):/code \
     -e PORT=${use_port} \
-    --entrypoint /opt/agent/pi-mono/node_modules/pi-rpc-http-server/bin/run.sh \
     "localhost/pi-mono:${use_version}" --mode rpc
 
 else
@@ -407,13 +415,10 @@ EOF
 
   docker run --rm -ti \
     -v "${temp_file}:/.pi/pi-run-with-args.sh:rw" \
-    -v ~/.gitconfig:/root/.gitconfig:ro \
-    -v ~/.gitconfig-github-private.inc:/root/.gitconfig-github-private.inc:ro \
     ${_ppi_host_attach_models_json_vol} \
     ${_ppi_host_attach_agents_vol} \
     ${_ppi_host_attach_prompts_vol} \
-    -v ~/.pi/agent/extensions/read-website:/root/.pi/agent/extensions/read-website:ro \
-    -v ~/.pi/agent/extensions/subagent:/root/.pi/agent/extensions/subagent:ro \
+    ${_ppi_host_add_file_vols} \
     -v "${use_host_session_dir}:${use_session_dir}" \
     -v "$(pwd):/code" \
     "localhost/pi-mono:${use_version}" --mode interactive
