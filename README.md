@@ -85,6 +85,10 @@ The `ppi` script supports the following flags:
 | `--no-prompt-templates`, `-np` | Disable prompt templates |
 | `--no-themes` | Disable themes |
 | `--no-context-files`, `-nc` | Disable AGENTS.md/CLAUDE.md context files |
+| `--ppi-host-attach-prompts` | Attach prompts directory to container |
+| `--ppi-host-attach-agents` | Attach agents directory to container |
+| `--ppi-host-attach-models-json` | Attach models.json file to container |
+| `--ppi-host-add-path <path>` | (empty) | Add custom volume mount (format: `host-path:container-path:rw` or `host-path:container-path:ro`; allows multiple) |
 
 ### Default Nickname Injection
 
@@ -113,6 +117,28 @@ ppi --system-prompt "You are a code reviewer" --prompt "Review PR #123"
 
 # Start RPC server on port 3000
 ppi --port 3000 --model gpt-4o
+
+# With prompts, agents and models.json directories attached
+ppi --ppi-host-attach-prompts --ppi-host-attach-agents --ppi-host-attach-models-json "Analyze this code"
+
+# With custom volume mounts
+ppi --ppi-host-add-path /path/to/config:/root/.config:ro --ppi-host-add-path /path/to/data:/data:rw "Process data"
+```
+
+By default, `ppi` doesn't mount any `pi` configuration from the host. If your `ppi` invocations involve a wider number of flags, you may want to create a `bash` function to apply them automatically. For example:
+
+```bash
+function ppi {
+  "${HOME}/.local/bin/ppi" \
+    --ppi-host-attach-models-json \
+    --ppi-host-attach-agents \
+    --ppi-host-attach-prompts \
+    --ppi-host-add-path "${HOME}/.gitconfig:/root/.gitconfig:ro" \
+    --ppi-host-add-path "${HOME}/.gitconfig-github-private.inc:/root/.gitconfig-github-private.inc:ro" \
+    --ppi-host-add-path "${HOME}/.pi/agent/extensions/read-website:/root/.pi/agent/extensions/read-website:ro" \
+    --ppi-host-add-path "${HOME}/.pi/agent/extensions/subagent:/root/.pi/agent/extensions/subagent:ro" \
+    "$@"
+}
 ```
 
 ---
