@@ -1,4 +1,5 @@
 #!/bin/bash
+# SPDX-License-Identifier: Apache-2.0
 
 # Base directory of this script (absolute path)
 base=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
