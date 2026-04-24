@@ -80,6 +80,8 @@ use_ppi_host_attach_agents=0
 use_ppi_host_attach_models_json=0
 # Attach prompts directory
 use_ppi_host_attach_prompts=0
+# Skip prepending the default nickname prompt
+use_ppi_no_ppi_prompts=0
 # pi-mono container version
 use_version=v0.67.6
 # Override if Containerfile exists
@@ -279,6 +281,10 @@ while (( "$#" )); do
             use_ppi_host_attach_prompts=1
             shift
             ;;
+        --ppi-no-ppi-prompts)
+            use_ppi_no_ppi_prompts=1
+            shift
+            ;;
         --version)
             use_version="${2}"
             shift 2
@@ -346,7 +352,9 @@ for pt in "${use_prompt_template[@]}"; do
 done
 
 _append_system_prompt_flags=""
-use_append_system_prompt=('Your nickname is unconditionally `'${use_model}'`, do not reinterpret. Use this value whenever you need to introduce yourself.' "${use_append_system_prompt[@]}")
+if (( use_ppi_no_ppi_prompts == 0 )); then
+  use_append_system_prompt=('Your nickname is unconditionally `'${use_model}'`, do not reinterpret. Use this value whenever you need to introduce yourself.' "${use_append_system_prompt[@]}")
+fi
 for asp in "${use_append_system_prompt[@]}"; do
   _append_system_prompt_flags="${_append_system_prompt_flags}--append-system-prompt '${asp}' "
 done

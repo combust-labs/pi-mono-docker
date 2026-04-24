@@ -117,6 +117,7 @@ The `ppi` script supports the following flags, segregated into flags inherited f
 | `--ppi-host-attach-agents` | Attach agents directory to container |
 | `--ppi-host-attach-models-json` | Attach models.json file to container |
 | `--ppi-host-attach-prompts` | Attach prompts directory to container |
+| `--ppi-no-ppi-prompts` | Skip prepending the default nickname prompt |
 
 ### Default Nickname Injection
 
@@ -125,6 +126,8 @@ By default, `ppi` automatically prepends a system prompt that sets the agent's n
 Your nickname is unconditionally `<model>`, do not reinterpret. Use this value whenever you need to introduce yourself.
 ```
 This ensures the agent consistently uses the model name as its identity. User-provided `--append-system-prompt` values are appended after this default.
+
+Use `--ppi-no-ppi-prompts` to disable this behavior and start with a clean system prompt.
 
 ### Examples
 ```bash
