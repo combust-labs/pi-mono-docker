@@ -74,7 +74,7 @@ The `ppi` script supports the following flags, segregated into flags inherited f
 | `--extension <path>`, `-e` | (empty) | Load extension file (allows multiple) |
 | `--list-models [search]` | enabled | List available models (optional search term; enabled when flag is present) |
 | `--mode <text\|json\|rpc>` | `text` | Output mode (`rpc` triggers HTTP-RPC server mode) |
-| `--model <pattern>` | `gpt-oss-120b-MXFP4-Q8` | Model pattern or ID (supports `provider/id` and optional `:thinking`) |
+| `--model <pattern>` | (required) | Model pattern or ID (supports `provider/id` and optional `:thinking`) |
 | `--prompt <text>` | `Summarize current the project` | Initial prompt to send to the agent |
 | `--prompt-template <path>` | (empty) | Load prompt template (allows multiple) |
 | `--provider <name>` | (empty) | Provider name |
@@ -129,10 +129,10 @@ This ensures the agent consistently uses the model name as its identity. User-pr
 ### Examples
 ```bash
 # Basic usage with default prompt
-# Note: This call works but is non-functional unless you explicitly provide
-# at least the models.json path via --ppi-host-attach-models-json or a
+# Note: This call requires --model to be specified explicitly. It also
+# needs the models.json path via --ppi-host-attach-models-json or a
 # custom mount via --ppi-host-add-path
-ppi
+ppi --model gpt-4o
 
 # Custom prompt
 ppi --prompt "List all TypeScript files in src/"

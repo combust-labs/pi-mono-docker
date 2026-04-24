@@ -16,8 +16,8 @@ use_extension=()
 use_list_models=""
 # Output mode (text|json|rpc)
 use_mode=""
-# Model pattern or ID
-use_model=${PI_DEFAULT_MODEL:-"gpt-oss-120b-MXFP4-Q8"}
+# Model pattern or ID (required)
+use_model=${PI_DEFAULT_MODEL:-}
 # Model cycling patterns (allows multiple)
 use_models=()
 # Disable AGENTS.md/CLAUDE.md context files
