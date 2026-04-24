@@ -308,6 +308,12 @@ while (( "$#" )); do
     esac
 done
 
+# Validate that model is provided
+if [[ -z "${use_model}" ]]; then
+  echo "Error: --model is required" >&2
+  exit 1
+fi
+
 # Validate thinking level if provided
 if [[ -n "${use_thinking}" ]] && ! is_valid_thinking "${use_thinking}"; then
   echo "Warning: Invalid thinking level \"${use_thinking}\". Valid values: off, minimal, low, medium, high, xhigh" >&2
