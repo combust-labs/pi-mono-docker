@@ -14,7 +14,7 @@ use_export=""
 use_extension=()
 # List available models (optional search term)
 use_list_models=""
-# Output mode (text|json, rpc is disallowed)
+# Output mode (text|json|rpc)
 use_mode=""
 # Model pattern or ID
 use_model=${PI_DEFAULT_MODEL:-"gpt-oss-120b-MXFP4-Q8"}
@@ -36,8 +36,10 @@ use_no_themes=0
 use_no_tools=0
 # Disable startup network operations
 use_offline=0
-# Start HTTP-RPC server on port n (CLI mode when 0)
-use_port=0
+# Internal container port (used in -e PORT), default 3000
+use_ppi_container_port=3000
+# Host port (exposed to host), defaults to use_ppi_container_port if not set
+use_ppi_host_port=""
 # Non-interactive mode (process prompt and exit)
 use_print=0
 # Initial prompt to send to the agent
@@ -115,7 +117,7 @@ is_valid_thinking() {
 is_valid_mode() {
   local mode=$1
   case "$mode" in
-    text|json)
+    text|json|rpc)
       return 0 # Valid
       ;;
     *)
@@ -281,6 +283,24 @@ while (( "$#" )); do
             use_version="${2}"
             shift 2
             ;;
+        --ppi-container-port)
+            if is_port "${2}"; then
+              use_ppi_container_port="${2}"
+              shift 2
+            else
+              echo "Error: Invalid port ${2}"
+              exit 1
+            fi
+            ;;
+        --ppi-host-port)
+            if is_port "${2}"; then
+              use_ppi_host_port="${2}"
+              shift 2
+            else
+              echo "Error: Invalid port ${2}"
+              exit 1
+            fi
+            ;;
         -*)
             echo "Error: Unsupported flag ${1}" >&2
             exit 1
@@ -294,11 +314,14 @@ if [[ -n "${use_thinking}" ]] && ! is_valid_thinking "${use_thinking}"; then
   use_thinking=""
 fi
 
-# Validate mode if provided (disallow rpc)
+# Validate mode if provided
 if [[ -n "${use_mode}" ]] && ! is_valid_mode "${use_mode}"; then
-  echo "Warning: Invalid mode \"${use_mode}\". Valid values: text, json" >&2
+  echo "Warning: Invalid mode \"${use_mode}\". Valid values: text, json, rpc" >&2
   use_mode=""
 fi
+
+# If host port not explicitly set, default to container port
+[[ -z "${use_ppi_host_port}" ]] && use_ppi_host_port="${use_ppi_container_port}"
 
 # Build multi-occurrence flags
 _extension_flags=""
@@ -348,17 +371,17 @@ for _f in "${use_ppi_host_add_path[@]}"; do
   _ppi_host_add_file_vols="${_ppi_host_add_file_vols}-v ${_f} "
 done
 
-if (( use_port >= 1  )); then
+if (( use_port >= 1  )) || [[ "${use_mode}" == "rpc" ]]; then
 
   docker run --rm -ti \
-    -p 3000:3000 \
+    -p ${use_ppi_host_port}:${use_ppi_container_port} \
     ${_ppi_host_attach_models_json_vol} \
     ${_ppi_host_attach_agents_vol} \
     ${_ppi_host_attach_prompts_vol} \
     ${_ppi_host_add_file_vols} \
     -v ${use_host_session_dir}:${use_session_dir} \
     -v $(pwd):/code \
-    -e PORT=${use_port} \
+    -e PORT=${use_ppi_container_port} \
     "localhost/pi-mono:${use_version}" --mode rpc
 
 else

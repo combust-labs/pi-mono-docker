@@ -26,16 +26,18 @@ Replace `<args>` with any command supported by the coding-agent CLI.
 ## `ppi` execution modes
 The helper script `ppi` provides two distinct ways to run the agent:
 
-1. **Interactive CLI mode (default)** - When no `--port` flag is supplied, `ppi` generates a temporary shell script containing all CLI arguments and mounts it into the container. The container's entrypoint (`pi-run.sh`) executes this script, which calls the `pi` CLI directly. Use this for quick, one-off queries.
+1. **Interactive CLI mode (default)** - When `--mode rpc` is not specified, `ppi` generates a temporary shell script containing all CLI arguments and mounts it into the container. The container's entrypoint (`pi-run.sh`) executes this script, which calls the `pi` CLI directly. Use this for quick, one-off queries.
    ```bash
    ppi                # runs the CLI inside the container
    ppi --model gpt-4  # specify a different model
    ```
    *Consequences*: the process runs synchronously, outputs to STDOUT/STDERR, and exits when the query is complete.
 
-2. **HTTP-RPC server mode** - Supplying `--port <n>` causes `ppi` to start the container with the `pi-rpc-http-server` entry-point (`/opt/agent/pi-mono/node_modules/pi-rpc-http-server/bin/run.sh`). The agent listens on the given port (exposed as `3000` inside the container) and serves a JSON-over-HTTP API.
+2. **HTTP-RPC server mode** - Supplying `--mode rpc` causes `ppi` to start the container with the `pi-rpc-http-server` entry-point (`/opt/agent/pi-mono/node_modules/pi-rpc-http-server/bin/run.sh`). The agent listens on the configured port (default `3000` inside the container) and serves a JSON-over-HTTP API.
    ```bash
-   ppi --port 3000   # start the RPC server
+   ppi --mode rpc   # start the RPC server (default port 3000)
+   ppi --mode rpc --ppi-container-port 8080  # custom container port
+   ppi --mode rpc --ppi-host-port 9000      # custom host port
    ```
    *Consequences*: the container stays running, accepting HTTP requests; suitable for integration with other tools or remote clients. No direct CLI output is produced; interactions must be performed via HTTP calls.
 
@@ -56,9 +58,10 @@ The `ppi` script supports the following flags:
 | `--append-system-prompt <text>` | nickname injection | Append text to system prompt (default: sets agent nickname to model name; allows multiple) |
 | `--prompt <text>` | `Summarize current the project` | Initial prompt to send to the agent |
 | `--thinking <level>` | (empty) | Thinking level: `off`, `minimal`, `low`, `medium`, `high`, `xhigh` |
-| `--port <n>` | (CLI mode) | Start HTTP-RPC server on port `n` |
+| `--mode <text|json|rpc>` | `text` | Output mode (`rpc` triggers HTTP-RPC server mode) |
+| `--ppi-container-port <n>` | `3000` | Internal container port (used in `-e PORT` env var) |
+| `--ppi-host-port <n>` | (container port) | Host port exposed to localhost; defaults to container port if not set |
 | `--version <v>` | from Containerfile | Override pi-mono container version |
-| `--mode <text|json>` | `text` | Output mode (rpc value is disallowed) |
 | `--session <path|id>` | (empty) | Use specific session |
 | `--session-dir <dir>` | `/sessions` | Session storage directory (container path) |
 | `--host-sessions-dir <dir>` | `$(pwd)/.pi/sessions` | Host directory to mount as /sessions volume |
@@ -115,8 +118,12 @@ ppi --continue "What did we discuss last time?"
 # With custom system prompt
 ppi --system-prompt "You are a code reviewer" --prompt "Review PR #123"
 
-# Start RPC server on port 3000
-ppi --port 3000 --model gpt-4o
+# Start RPC server on default port 3000
+ppi --mode rpc
+
+# Start RPC server with custom ports
+ppi --mode rpc --ppi-container-port 8080
+ppi --mode rpc --ppi-host-port 9000 --ppi-container-port 8080
 
 # With prompts, agents and models.json directories attached
 ppi --ppi-host-attach-prompts --ppi-host-attach-agents --ppi-host-attach-models-json "Analyze this code"
