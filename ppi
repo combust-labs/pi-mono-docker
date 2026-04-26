@@ -333,6 +333,7 @@ fi
 
 # Create session directory only if --no-session is not specified
 if [[ "${use_no_session}" != "1" ]] && [ ! -d "${use_host_session_dir}" ]; then
+  echo "still creating..."
   mkdir -p "${use_host_session_dir}"
 fi
 
@@ -380,6 +381,9 @@ done
 [[ "${use_ppi_host_attach_agents}" == "1" ]] && _ppi_host_attach_agents_vol="-v ${HOME}/.pi/agent/agents:/root/.pi/agent/agents:ro" || _ppi_host_attach_agents_vol=""
 [[ "${use_ppi_host_attach_models_json}" == "1" ]] && _ppi_host_attach_models_json_vol="-v ${HOME}/.pi/agent/models.json:/root/.pi/agent/models.json:ro" || _ppi_host_attach_models_json_vol=""
 
+# Conditional session directory mount (only when --no-session is NOT provided)
+[[ "${use_no_session}" != "1" ]] && _session_vol="-v ${use_host_session_dir}:${use_session_dir}" || _session_vol=""
+
 # Build volume mounts for --ppi-host-add-path
 _ppi_host_add_file_vols=""
 for _f in "${use_ppi_host_add_path[@]}"; do
@@ -394,7 +398,7 @@ if (( use_port >= 1  )) || [[ "${use_mode}" == "rpc" ]]; then
     ${_ppi_host_attach_agents_vol} \
     ${_ppi_host_attach_prompts_vol} \
     ${_ppi_host_add_file_vols} \
-    -v ${use_host_session_dir}:${use_session_dir} \
+    ${_session_vol} \
     -v $(pwd):/code \
     -e PORT=${use_ppi_container_port} \
     "localhost/pi-mono:${use_version}" --mode rpc
@@ -460,7 +464,7 @@ EOF
     ${_ppi_host_attach_agents_vol} \
     ${_ppi_host_attach_prompts_vol} \
     ${_ppi_host_add_file_vols} \
-    -v "${use_host_session_dir}:${use_session_dir}" \
+    ${_session_vol} \
     -v "$(pwd):/code" \
     "localhost/pi-mono:${use_version}" --mode interactive
     
