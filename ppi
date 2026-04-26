@@ -134,10 +134,6 @@ is_flag() {
   [[ "${arg}" == --* ]] || [[ "${arg}" == -* ]]
 }
 
-if [ ! -d "${use_host_session_dir}" ]; then
-  mkdir -p "${use_host_session_dir}"
-fi
-
 while (( "$#" )); do
     case "${1}" in
         --append-system-prompt)
@@ -334,6 +330,11 @@ fi
 
 # If host port not explicitly set, default to container port
 [[ -z "${use_ppi_host_port}" ]] && use_ppi_host_port="${use_ppi_container_port}"
+
+# Create session directory only if --no-session is not specified
+if [[ "${use_no_session}" != "1" ]] && [ ! -d "${use_host_session_dir}" ]; then
+  mkdir -p "${use_host_session_dir}"
+fi
 
 # Build multi-occurrence flags
 _extension_flags=""
