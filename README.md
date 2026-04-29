@@ -18,13 +18,13 @@ This repository provides a comprehensive Docker image that runs the **pi-mono co
 ```bash
 make build-docker   # builds the image with the tag localhost/pi-mono:<version>
 ```
-The `<version>` is taken from the `ARG PI_MONO_VERSION` line in `container/Containerfile` (default `v0.67.6`).
+The `<version>` is taken from the `ARG PI_MONO_VERSION` line in `container/Containerfile`.
 
 The following build args are supported:
 
 | Build Arg | Default | Description |
 |-----------|---------|-------------|
-| `PI_MONO_VERSION` | `v0.67.6` | Version of pi-mono to clone and build |
+| `PI_MONO_VERSION` | `v0.70.6` | Version of pi-mono to clone and build |
 | `PI_RPC_HTTP_SERVER_VERSION` | (empty) | Version of pi-rpc-http-server to install (uses pi-mono version if empty) |
 | `NPM_VERSION` | (empty) | Specific npm version to install (optional) |
 | `NODE_VERSION` | `25` | Node.js version to use (reflected in `node:<VERSION>-trixie` base) |

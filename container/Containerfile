@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 FROM node:25-trixie
 
-ARG PI_MONO_VERSION=v0.67.6
+ARG PI_MONO_VERSION=v0.70.6
 ARG PI_MONO_GIT_REPO=https://github.com/badlogic/pi-mono.git
 
 ENV PATH="$PATH:/root/.local/bin:/opt/agent/pi-mono/packages/coding-agent/dist" \
