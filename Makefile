@@ -12,12 +12,17 @@ VERSION := $(shell grep -E '^ARG PI_MONO_VERSION=' container/Containerfile | cut
 # Extract the PI_MONO_GIT_REPO argument from Containerfile
 PI_MONO_GIT_REPO := $(shell grep -E '^ARG PI_MONO_GIT_REPO=' container/Containerfile | cut -d'=' -f2)
 
+# Extensions to install (comma-separated list, e.g., "read-website,subagent")
+PI_MONO_EXTENSIONS ?= ""
+
 .PHONY: build-docker install-ppi check-update hf-push-sessions
 build-docker:
 	@echo "Building Docker image with tag localhost/pi-mono:$(VERSION)"
+	@echo "Extensions: $(PI_MONO_EXTENSIONS)"
 	@cd container && docker build --no-cache -f Containerfile \
 		--build-arg PI_MONO_VERSION=$(VERSION) \
 		--build-arg PI_MONO_GIT_REPO=$(PI_MONO_GIT_REPO) \
+		--build-arg PI_MONO_EXTENSIONS=$(PI_MONO_EXTENSIONS) \
 		-t localhost/pi-mono:$(VERSION) .
 
 install-ppi:

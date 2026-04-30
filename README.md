@@ -20,11 +20,29 @@ make build-docker   # builds the image with the tag localhost/pi-mono:<version>
 ```
 The `<version>` is taken from the `ARG PI_MONO_VERSION` line in `container/Containerfile`.
 
+### Installing extensions at build time
+
+Extensions can be installed during the Docker build by passing `PI_MONO_EXTENSIONS`:
+
+```bash
+# With make (comma-separated list)
+make build-docker PI_MONO_EXTENSIONS="read-website,subagent"
+
+# With docker directly
+docker build -f container/Containerfile \
+  --build-arg PI_MONO_EXTENSIONS="read-website,subagent" \
+  -t localhost/pi-mono:v0.70.6 container/
+```
+
+Extensions are installed into `~/.pi/agent/extensions/` inside the image and are available at runtime without additional setup.
+
 The following build args are supported:
 
 | Build Arg | Default | Description |
 |-----------|---------|-------------|
 | `PI_MONO_VERSION` | `v0.70.6` | Version of pi-mono to clone and build |
+| `PI_MONO_GIT_REPO` | `https://github.com/badlogic/pi-mono.git` | Git repository to clone pi-mono from |
+| `PI_MONO_EXTENSIONS` | (empty) | Comma-separated list of extensions to install at build time (e.g., `read-website,subagent`) |
 | `PI_RPC_HTTP_SERVER_VERSION` | (empty) | Version of pi-rpc-http-server to install (uses pi-mono version if empty) |
 | `NPM_VERSION` | (empty) | Specific npm version to install (optional) |
 | `NODE_VERSION` | `25` | Node.js version to use (reflected in `node:<VERSION>-trixie` base) |
