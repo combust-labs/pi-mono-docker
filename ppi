@@ -80,6 +80,8 @@ use_ppi_host_attach_agents=0
 use_ppi_host_attach_models_json=0
 # Attach prompts directory
 use_ppi_host_attach_prompts=0
+# Pass environment variables to container (NAME=VALUE)
+use_ppi_pass_env=()
 # Skip prepending the default nickname prompt
 use_ppi_no_ppi_prompts=0
 # pi-mono container version
@@ -277,6 +279,10 @@ while (( "$#" )); do
             use_ppi_host_attach_prompts=1
             shift
             ;;
+        --ppi-pass-env)
+            use_ppi_pass_env+=("${2}")
+            shift 2
+            ;;
         --ppi-no-ppi-prompts)
             use_ppi_no_ppi_prompts=1
             shift
@@ -390,6 +396,12 @@ for _f in "${use_ppi_host_add_path[@]}"; do
   _ppi_host_add_file_vols="${_ppi_host_add_file_vols}-v ${_f} "
 done
 
+# Build env vars for --ppi-pass-env
+_ppi_pass_env_flags=""
+for _e in "${use_ppi_pass_env[@]}"; do
+  _ppi_pass_env_flags="${_ppi_pass_env_flags}-e ${_e} "
+done
+
 if (( use_port >= 1  )) || [[ "${use_mode}" == "rpc" ]]; then
 
   docker run --rm -ti \
@@ -401,6 +413,7 @@ if (( use_port >= 1  )) || [[ "${use_mode}" == "rpc" ]]; then
     ${_session_vol} \
     -v $(pwd):/code \
     -e PORT=${use_ppi_container_port} \
+    ${_ppi_pass_env_flags} \
     "localhost/pi-mono:${use_version}" --mode rpc
 
 else
@@ -466,6 +479,7 @@ EOF
     ${_ppi_host_add_file_vols} \
     ${_session_vol} \
     -v "$(pwd):/code" \
+    ${_ppi_pass_env_flags} \
     "localhost/pi-mono:${use_version}" --mode interactive
     
 fi

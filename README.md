@@ -127,6 +127,7 @@ The `ppi` script supports the following flags, segregated into flags inherited f
 | `--ppi-container-port <n>` | `3000` | Internal container port (used in `-e PORT` env var) |
 | `--ppi-host-add-path <path>` | (empty) | Add custom volume mount (format: `host-path:container-path:rw` or `host-path:container-path:ro`; allows multiple) |
 | `--ppi-host-port <n>` | (container port) | Host port exposed to localhost; defaults to container port if not set |
+| `--ppi-pass-env <name>=<value>` | (empty) | Pass environment variable to container as `-e name=value` (allows multiple) |
 | `--version <v>` | from Containerfile | Override pi-mono container version |
 
 ### ppi-specific Boolean Flags
@@ -179,7 +180,9 @@ ppi --ppi-host-attach-prompts --ppi-host-attach-agents --ppi-host-attach-models-
 
 # With custom volume mounts
 ppi --ppi-host-add-path /path/to/config:/root/.config:ro --ppi-host-add-path /path/to/data:/data:rw "Process data"
-```
+
+# With custom environment variables passed to container
+ppi --ppi-pass-env OPENAI_API_KEY=sk-xxx --ppi-pass-env CUSTOM_VAR=hello "Use the env vars"
 
 By default, `ppi` doesn't mount any `pi` configuration from the host. If your `ppi` invocations involve a wider number of flags, you may want to create a `bash` function to apply them automatically. For example:
 
