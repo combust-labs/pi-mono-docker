@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: Apache-2.0
 FROM node:25-trixie
 
-ARG PI_MONO_VERSION=v0.70.6
+ARG PI_MONO_VERSION=v0.71.1
 ARG PI_MONO_GIT_REPO=https://github.com/badlogic/pi-mono.git
 ARG PI_MONO_EXTENSIONS=""
 
@@ -37,8 +37,8 @@ RUN mkdir -p ~/.local/bin \
   && chmod 0755 /opt/agent/pi-mono/packages/coding-agent/dist/pi \
   && echo " => install extensions" \
   && if [ -n "${PI_MONO_EXTENSIONS}" ]; then \
-        echo "${PI_MONO_EXTENSIONS}" | tr ',' '\n' | xargs -I{} /opt/agent/pi-mono/packages/coding-agent/dist/pi install {} ; \
-     fi \
+  echo "${PI_MONO_EXTENSIONS}" | tr ',' '\n' | xargs -I{} /opt/agent/pi-mono/packages/coding-agent/dist/pi install {} ; \
+  fi \
   && echo " => installing pi-mono-http-proxy" \
   && npm install --save "git://github.com/combust-labs/pi-mono-http-proxy.git#3ec12f7e68f0578369935810b669d08638e9d371" \
   && chmod 0755 /opt/agent/pi-mono/node_modules/pi-rpc-http-server/bin/run.sh \
