@@ -26,12 +26,13 @@ Extensions can be installed during the Docker build by passing `PI_MONO_EXTENSIO
 
 ```bash
 # With make (comma-separated list)
-make build-docker PI_MONO_EXTENSIONS="read-website,subagent"
+make build-docker PI_MONO_EXTENSIONS="git:https://github.com/combust-labs/read-website,subagent"
 
 # With docker directly
+version=$(grep -E '^ARG PI_MONO_VERSION=' container/Containerfile | cut -d'=' -f2)
 docker build -f container/Containerfile \
   --build-arg PI_MONO_EXTENSIONS="read-website,subagent" \
-  -t localhost/pi-mono:v0.70.6 container/
+  -t "localhost/pi-mono:${version}" container/
 ```
 
 Extensions are installed into `~/.pi/agent/extensions/` inside the image and are available at runtime without additional setup.
@@ -40,7 +41,7 @@ The following build args are supported:
 
 | Build Arg | Default | Description |
 |-----------|---------|-------------|
-| `PI_MONO_VERSION` | `v0.70.6` | Version of pi-mono to clone and build |
+| `PI_MONO_VERSION` | from `Containerfile` | Version of pi-mono to clone and build |
 | `PI_MONO_GIT_REPO` | `https://github.com/badlogic/pi-mono.git` | Git repository to clone pi-mono from |
 | `PI_MONO_EXTENSIONS` | (empty) | Comma-separated list of extensions to install at build time (e.g., `read-website,subagent`) |
 | `PI_RPC_HTTP_SERVER_VERSION` | (empty) | Version of pi-rpc-http-server to install (uses pi-mono version if empty) |
@@ -49,11 +50,12 @@ The following build args are supported:
 
 ## Running the container
 ```bash
+version=$(grep -E '^ARG PI_MONO_VERSION=' container/Containerfile | cut -d'=' -f2)
 docker run \
   -v $(pwd):/code \
   -e HTTP_PROXY=... \
   -e HTTPS_PROXY=... \
-  localhost/pi-mono:<version> \
+  "localhost/pi-mono:${version}" \
   <args>
 ```
 Replace `<args>` with any command supported by the coding-agent CLI.

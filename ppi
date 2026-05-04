@@ -85,7 +85,7 @@ use_ppi_pass_env=()
 # Skip prepending the default nickname prompt
 use_ppi_no_ppi_prompts=0
 # pi-mono container version
-use_version=v0.71.1
+use_version=v0.73.0
 # Override if Containerfile exists
 if [ -f "${base}/container/Containerfile" ]; then
   use_version=$(grep -E '^ARG PI_MONO_VERSION=' "${base}/container/Containerfile" | cut -d'=' -f2)
