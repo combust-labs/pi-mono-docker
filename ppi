@@ -80,6 +80,8 @@ use_ppi_host_attach_agents=0
 use_ppi_host_attach_models_json=0
 # Attach prompts directory
 use_ppi_host_attach_prompts=0
+# Container network mode (sets --network on docker run)
+use_ppi_container_network=""
 # Pass environment variables to container (NAME=VALUE)
 use_ppi_pass_env=()
 # Skip prepending the default nickname prompt
@@ -279,6 +281,10 @@ while (( "$#" )); do
             use_ppi_host_attach_prompts=1
             shift
             ;;
+        --ppi-container-network)
+            use_ppi_container_network="${2}"
+            shift 2
+            ;;
         --ppi-pass-env)
             use_ppi_pass_env+=("${2}")
             shift 2
@@ -402,9 +408,13 @@ for _e in "${use_ppi_pass_env[@]}"; do
   _ppi_pass_env_flags="${_ppi_pass_env_flags}-e ${_e} "
 done
 
+# Build network flag for --ppi-container-network
+[[ -n "${use_ppi_container_network}" ]] && _network_flag="--network ${use_ppi_container_network}" || _network_flag=""
+
 if (( use_port >= 1  )) || [[ "${use_mode}" == "rpc" ]]; then
 
   docker run --rm -ti \
+    ${_network_flag} \
     -p ${use_ppi_host_port}:${use_ppi_container_port} \
     ${_ppi_host_attach_models_json_vol} \
     ${_ppi_host_attach_agents_vol} \
@@ -472,6 +482,7 @@ EOF
   echo -e "$minimal" > "${temp_file}"
 
   docker run --rm -ti \
+    ${_network_flag} \
     -v "${temp_file}:/.pi/pi-run-with-args.sh:rw" \
     ${_ppi_host_attach_models_json_vol} \
     ${_ppi_host_attach_agents_vol} \

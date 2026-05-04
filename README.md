@@ -126,6 +126,7 @@ The `ppi` script supports the following flags, segregated into flags inherited f
 | Flag | Default | Description |
 |------|---------|-------------|
 | `--host-sessions-dir <dir>` | `$(pwd)/.pi/sessions` | Host directory to mount as /sessions volume |
+| `--ppi-container-network <name>` | (empty) | Docker network to connect the container to (e.g., `host`, `bridge`, or a custom network) |
 | `--ppi-container-port <n>` | `3000` | Internal container port (used in `-e PORT` env var) |
 | `--ppi-host-add-path <path>` | (empty) | Add custom volume mount (format: `host-path:container-path:rw` or `host-path:container-path:ro`; allows multiple) |
 | `--ppi-host-port <n>` | (container port) | Host port exposed to localhost; defaults to container port if not set |
@@ -176,6 +177,10 @@ ppi --mode rpc
 # Start RPC server with custom ports
 ppi --mode rpc --ppi-container-port 8080
 ppi --mode rpc --ppi-host-port 9000 --ppi-container-port 8080
+
+# With custom container network
+ppi --ppi-container-network host "Check network connectivity"
+ppi --mode rpc --ppi-container-network my-custom-network
 
 # With prompts, agents and models.json directories attached
 ppi --ppi-host-attach-prompts --ppi-host-attach-agents --ppi-host-attach-models-json "Analyze this code"
