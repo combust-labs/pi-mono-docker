@@ -128,6 +128,7 @@ The `ppi` script supports the following flags, segregated into flags inherited f
 | `--host-sessions-dir <dir>` | `$(pwd)/.pi/sessions` | Host directory to mount as /sessions volume |
 | `--ppi-container-network <name>` | (empty) | Docker network to connect the container to (e.g., `host`, `bridge`, or a custom network) |
 | `--ppi-container-port <n>` | `3000` | Internal container port (used in `-e PORT` env var) |
+| `--ppi-extra-host <host:ip>` | (empty) | Add host-to-IP mapping to the container (repeatable; e.g., `myhost:host-gateway`) |
 | `--ppi-host-add-path <path>` | (empty) | Add custom volume mount (format: `host-path:container-path:rw` or `host-path:container-path:ro`; allows multiple) |
 | `--ppi-host-port <n>` | (container port) | Host port exposed to localhost; defaults to container port if not set |
 | `--ppi-pass-env <name>=<value>` | (empty) | Pass environment variable to container as `-e name=value` (allows multiple) |
@@ -181,6 +182,13 @@ ppi --mode rpc --ppi-host-port 9000 --ppi-container-port 8080
 # With custom container network
 ppi --ppi-container-network host "Check network connectivity"
 ppi --mode rpc --ppi-container-network my-custom-network
+
+# With extra host entries (e.g., to resolve a service name to host gateway)
+ppi --ppi-extra-host "myhost:host-gateway" "Access myhost service"
+ppi --ppi-extra-host "db.local:host-gateway" --ppi-extra-host "api.local:host-gateway" "Access multiple services"
+
+# Resolve host's services via host.docker.internal (common pattern on macOS/Windows)
+ppi --ppi-extra-host "host.docker.internal:host-gateway" "Access services on host machine"
 
 # With prompts, agents and models.json directories attached
 ppi --ppi-host-attach-prompts --ppi-host-attach-agents --ppi-host-attach-models-json "Analyze this code"

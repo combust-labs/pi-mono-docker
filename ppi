@@ -74,6 +74,8 @@ use_verbose=0
 
 # Additional host files to mount (host-path:container-path:rw|ro)
 use_ppi_host_add_path=()
+# Additional --add-host entries (host:ip or host:host-gateway)
+use_ppi_extra_host=()
 # Attach agents directory
 use_ppi_host_attach_agents=0
 # Attach models.json file from host
@@ -269,6 +271,10 @@ while (( "$#" )); do
             use_ppi_host_add_path+=("${2}")
             shift 2
             ;;
+        --ppi-extra-host)
+            use_ppi_extra_host+=("${2}")
+            shift 2
+            ;;
         --ppi-host-attach-agents)
             use_ppi_host_attach_agents=1
             shift
@@ -408,6 +414,12 @@ for _e in "${use_ppi_pass_env[@]}"; do
   _ppi_pass_env_flags="${_ppi_pass_env_flags}-e ${_e} "
 done
 
+# Build --add-host flags for --ppi-extra-host
+_ppi_extra_host_flags=""
+for _h in "${use_ppi_extra_host[@]}"; do
+  _ppi_extra_host_flags="${_ppi_extra_host_flags}--add-host ${_h} "
+done
+
 # Build network flag for --ppi-container-network
 [[ -n "${use_ppi_container_network}" ]] && _network_flag="--network ${use_ppi_container_network}" || _network_flag=""
 
@@ -415,6 +427,7 @@ if (( use_port >= 1  )) || [[ "${use_mode}" == "rpc" ]]; then
 
   docker run --rm -ti \
     ${_network_flag} \
+    ${_ppi_extra_host_flags} \
     -p ${use_ppi_host_port}:${use_ppi_container_port} \
     ${_ppi_host_attach_models_json_vol} \
     ${_ppi_host_attach_agents_vol} \
@@ -483,6 +496,7 @@ EOF
 
   docker run --rm -ti \
     ${_network_flag} \
+    ${_ppi_extra_host_flags} \
     -v "${temp_file}:/.pi/pi-run-with-args.sh:rw" \
     ${_ppi_host_attach_models_json_vol} \
     ${_ppi_host_attach_agents_vol} \
